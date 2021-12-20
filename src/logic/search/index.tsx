@@ -6,28 +6,30 @@ import {posn} from "../generic/posn";
 import LifoList from "../generic/lifoList";
 
 export interface SearchResult {
-  readonly found: number[];
-  readonly path: number[];
+  readonly found: IdMap;
+  readonly path: IdMap;
 }
 
-export function bfsFinish(maze: Maze) {
+export function bfsFinish(maze: Maze): SearchResult {
   const worklist = new BfsList<number>();
   worklist.add(0);
   return search(worklist, maze, maze.posToNode.find(posn(maze.xDim - 1, maze.yDim - 1)));
 }
 
-export function dfsFinish(maze: Maze) {
+export function dfsFinish(maze: Maze): SearchResult {
   const worklist = new LifoList<number>();
   worklist.add(0);
   return search(worklist, maze, maze.posToNode.find(posn(maze.xDim - 1, maze.yDim - 1)));
 }
 
 export function search(worklist: Worklist<number>, maze: Maze, target: number): SearchResult {
-  const found: number[] = [];
+  const found: IdMap = new Map<number, number>();
   const parents: IdMap = new Map<number, number>();
 
+  let order = 0;
   while (!worklist.isEmpty()) {
-    searchNode(worklist, maze, target, found, parents);
+    searchNode(worklist, maze, target, found, parents, order);
+    order++;
   }
 
   return { found, path: reconstructPath(parents, maze, target) };
@@ -41,17 +43,17 @@ function getNodeNeighbors(node: number, maze: Maze): number[] {
   return neighbors;
 }
 
-function searchNode(worklist: Worklist<number>, maze: Maze, target: number, found: number[], parents: IdMap): void {
+function searchNode(worklist: Worklist<number>, maze: Maze, target: number, found: IdMap, parents: IdMap, order: number): void {
   const next = worklist.removeNext();
-  if (next !== null && !found.includes(next)) {
-    found.push(next);
+  if (next !== null && !found.has(next)) {
+    found.set(next, order);
     if (next === target) {
       worklist.removeAll();
     } else {
       const nodesToProcess = getNodeNeighbors(next, maze);
-      nodesToProcess.filter((neighbor) => !found.includes(neighbor));
+      nodesToProcess.filter((neighbor) => !found.has(neighbor));
       nodesToProcess.forEach((neighbor) => {
-        if (!found.includes(neighbor)) {
+        if (!found.has(neighbor)) {
           worklist.add(neighbor);
           parents.set(neighbor, next);
         }
@@ -60,16 +62,18 @@ function searchNode(worklist: Worklist<number>, maze: Maze, target: number, foun
   }
 }
 
-function reconstructPath(parents: IdMap, maze: Maze, target: number): number[] {
-  const path = [];
+function reconstructPath(parents: IdMap, maze: Maze, target: number): IdMap {
+  const path = new Map<number, number>();
   let at = target;
+  let order = 0;
   while (at !== 0) {
-    path.unshift(at);
+    path.set(at, order);
     const parent = parents.get(at);
     if (parent !== undefined) {
       at = parent;
+      order++;
     }
   }
-  path.unshift(at);
+  path.set(at, order);
   return path;
 }

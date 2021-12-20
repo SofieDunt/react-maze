@@ -45,26 +45,31 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   const [cellDim, setCellDim] = useState(0);
   const [player, setPlayer] = useState(posn(0, 0));
   const [playerSolved, setPlayerSolved] = useState(false);
-  const [playerFound, setPlayerFound] = useState(new Set<number>());
-  const [searchResult, setSearchResult] = useState<SearchResult>({ found: [], path: [] });
+  const [numPlayerFound, setNumPlayerFound] = useState(0);
+  const [playerFound, setPlayerFound] = useState(new Map<number, number>());
+  const [searchResult, setSearchResult] = useState<SearchResult>({ found: new Map<number, number>(), path: new Map<number, number>() });
   const [timeoutId, setTimeoutId] = useState<any>();
   const delay = 300;
 
   const resetSearch = () => {
     clearTimeout(timeoutId);
-    setSearchResult({ found: [], path: [] });
+    setSearchResult({ found: new Map<number, number>(), path: new Map<number, number>() });
   }
 
   useEffect(() => {
-    setSearchResult({ found: [], path: [] });
+    setSearchResult({ found: new Map<number, number>(), path: new Map<number, number>() });
     setPlayer(posn(0, 0));
-    setPlayerFound(new Set<number>());
+    setPlayerFound(new Map<number, number>());
   }, [maze])
 
   const onPlayerFind = (found: Posn): void => {
     setPlayer(found);
-    playerFound.add(maze.posToNode.find(found));
-    onPlayerSolve(found);
+    const nodeFound = maze.posToNode.find(found);
+    if (!playerFound.has(nodeFound)) {
+      setNumPlayerFound((prev) => prev + 1);
+      playerFound.set(nodeFound, numPlayerFound);
+      onPlayerSolve(found);
+    }
   }
 
   const onPlayerSolve = (pos: Posn): void => {
@@ -73,20 +78,18 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
       const path = bfsFinish(maze).path;
       resetSearch();
 
-      const playerFoundArray: number[] = [];
-      playerFound.forEach((val) => playerFoundArray.push(val));
-      setSearchResult({found: playerFoundArray, path: []});
+      setSearchResult({found: playerFound, path: new Map<number, number>()});
       setTimeoutId(setTimeout(() => setSearchResult({
-        found: playerFoundArray,
+        found: playerFound,
         path
-      }), delay * playerFoundArray.length));
+      }), delay * playerFound.size));
     }
   }
 
   const onFinishSearch = (result: SearchResult): void => {
     resetSearch();
-    setTimeoutId(setTimeout(() => setSearchResult({ found: result.found, path: [] }), 1));
-    setTimeoutId(setTimeout(() => setSearchResult(result), delay * result.found.length));
+    setTimeoutId(setTimeout(() => setSearchResult({ found: result.found, path: new Map<number, number>()}), 1));
+    setTimeoutId(setTimeout(() => setSearchResult(result), delay * result.found.size));
   }
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -125,7 +128,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
         resetSearch();
         setPlayer(posn(0, 0));
         setPlayerSolved(false);
-        setPlayerFound(new Set<number>());
+        setPlayerFound(new Map<number, number>());
         break;
     }
   }
@@ -154,7 +157,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
         </SolvedBanner>
         <MazeDisplayContainer maze={maze} cellDim={cellDim}>
           {maze.nodes.map((node, id) => {
-            return <NodeDisplay key={id} className={(searchResult.found.includes(id) ? 'found' : '') + (searchResult.path.includes(id) ? ' path' : '')} node={node} maze={maze} found={searchResult.found} path={searchResult.path} cellDim={cellDim} delay={delay} />
+            return <NodeDisplay key={id} className={(searchResult.found.has(id) ? 'found' : '') + (searchResult.path.has(id) ? ' path' : '')} node={node} maze={maze} found={searchResult.found} path={searchResult.path} cellDim={cellDim} delay={delay} />
           })}
           <PlayerDisplay cellDim={cellDim} player={player} maze={maze} />
         </MazeDisplayContainer>

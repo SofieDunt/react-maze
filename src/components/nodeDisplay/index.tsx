@@ -11,12 +11,13 @@ import {
 import {ScaledDisplayProps, getCellDim} from "../types";
 import Maze from "../../logic/maze";
 import {hasPathToBottom, hasPathToRight} from "../../logic/navigate";
+import {IdMap} from "../../logic/utils";
 
 interface NodeDisplayProps extends ScaledDisplayProps {
   readonly node: Node;
   readonly maze: Maze;
-  readonly found: number[];
-  readonly path: number[];
+  readonly found: IdMap;
+  readonly path: IdMap;
   readonly delay: number;
 }
 
@@ -79,16 +80,18 @@ const getDelay = (props: NodeDisplayProps) => {
 }
 
 const getFoundDelay = (props: NodeDisplayProps) => {
-  if (props.found.includes(props.node.id)) {
-    return props.found.findIndex((value => { return value === props.node.id })) * props.delay;
+  const order = props.found.get(props.node.id);
+  if (order !== undefined) {
+    return order * props.delay;
   } else {
     return 0;
   }
 }
 
 const getPathDelay = (props: NodeDisplayProps) => {
-  if (props.path.includes(props.node.id)) {
-    return ((props.path.length * props.delay) -  (props.path.findIndex((value => { return value === props.node.id})) * props.delay)) / 2;
+  const order = props.path.get(props.node.id);
+  if (order !== undefined) {
+    return order * props.delay / 2;
   } else {
     return 0;
   }
