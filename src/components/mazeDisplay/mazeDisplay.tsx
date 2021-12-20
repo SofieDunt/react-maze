@@ -6,7 +6,7 @@ import PlayerDisplay from "../playerDisplay";
 import {ScaledDisplayProps} from "../types";
 import {canMoveDown, canMoveLeft, canMoveRight, canMoveUp} from "../../logic/navigate";
 import Posn, {posn} from "../../logic/generic/posn";
-import {bfsFinish, dfsFinish, SearchResult} from "../../logic/search";
+import {bfsFinish, dfsFinish, reconstructPath, SearchResult} from "../../logic/search";
 import {BORDER_COLOR} from "../../theme";
 
 type MazeDisplayContainerProps = ScaledDisplayProps & MazeDisplayProps;
@@ -45,8 +45,8 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   const [cellDim, setCellDim] = useState(0);
   const [player, setPlayer] = useState(posn(0, 0));
   const [playerSolved, setPlayerSolved] = useState(false);
-  const [numPlayerFound, setNumPlayerFound] = useState(0);
   const [playerFound, setPlayerFound] = useState(new Map<number, number>());
+  const [playerParents, setPlayerParents] = useState(new Map<number, number>());
   const [searchResult, setSearchResult] = useState<SearchResult>({ found: new Map<number, number>(), path: new Map<number, number>() });
   const [timeoutId, setTimeoutId] = useState<any>();
   const delay = 300;
@@ -56,32 +56,39 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
     setSearchResult({ found: new Map<number, number>(), path: new Map<number, number>() });
   }
 
+  const resetPlayer = () => {
+    setPlayer(posn(0, 0));
+    setPlayerSolved(false);
+    setPlayerFound(new Map<number, number>());
+    setPlayerParents(new Map<number, number>());
+  }
+
   useEffect(() => {
     setSearchResult({ found: new Map<number, number>(), path: new Map<number, number>() });
-    setPlayer(posn(0, 0));
-    setPlayerFound(new Map<number, number>());
+    resetPlayer();
   }, [maze])
 
   const onPlayerFind = (found: Posn): void => {
-    setPlayer(found);
     const nodeFound = maze.posToNode.find(found);
     if (!playerFound.has(nodeFound)) {
-      setNumPlayerFound((prev) => prev + 1);
-      playerFound.set(nodeFound, numPlayerFound);
+      playerFound.set(nodeFound, playerFound.size + 1);
+      playerParents.set(nodeFound, maze.posToNode.find(player));
+      setPlayer(found);
       onPlayerSolve(found);
+    } else {
+      setPlayer(found);
     }
   }
 
   const onPlayerSolve = (pos: Posn): void => {
     if (pos.x === maze.xDim - 1 && pos.y === maze.yDim - 1) {
       setPlayerSolved(true);
-      const path = bfsFinish(maze).path;
       resetSearch();
 
       setSearchResult({found: playerFound, path: new Map<number, number>()});
       setTimeoutId(setTimeout(() => setSearchResult({
         found: playerFound,
-        path
+        path: reconstructPath(playerParents, maze, maze.posToNode.find(posn(maze.xDim - 1, maze.yDim - 1))),
       }), delay * playerFound.size));
     }
   }
@@ -126,9 +133,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
         break;
       case ('r'):
         resetSearch();
-        setPlayer(posn(0, 0));
-        setPlayerSolved(false);
-        setPlayerFound(new Map<number, number>());
+        resetPlayer();
         break;
     }
   }

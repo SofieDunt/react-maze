@@ -62,7 +62,7 @@ function searchNode(worklist: Worklist<number>, maze: Maze, target: number, foun
   }
 }
 
-function reconstructPath(parents: IdMap, maze: Maze, target: number): IdMap {
+export function reconstructPath(parents: IdMap, maze: Maze, target: number): IdMap {
   const path = new Map<number, number>();
   let at = target;
   let order = 0;
