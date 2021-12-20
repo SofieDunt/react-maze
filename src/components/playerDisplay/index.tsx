@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Posn from "../../logic/dataStructures/posn";
+import Posn from "../../logic/generic/posn";
 import {PLAYER_COLOR, STANDARD_COLOR} from "../../theme";
 import {getCellDim, ScaledDisplayProps} from "../types";
 

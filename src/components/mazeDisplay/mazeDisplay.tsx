@@ -4,7 +4,8 @@ import Maze from "../../logic/maze";
 import NodeDisplay from "../nodeDisplay";
 import PlayerDisplay from "../playerDisplay";
 import {ScaledDisplayProps} from "../types";
-import {canMoveDown, canMoveLeft, canMoveRight, canMoveUp} from "../../logic/utils";
+import {canMoveDown, canMoveLeft, canMoveRight, canMoveUp} from "../../logic/navigate";
+import {posn} from "../../logic/generic/posn";
 
 interface MazeDisplayContainerProps extends ScaledDisplayProps, MazeDisplayProps{
 }
@@ -36,7 +37,7 @@ interface MazeDisplayProps {
 
 const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   const [cellDim, setCellDim] = useState(0);
-  const [player, setPlayer] = useState({ x: 0, y: 0 });
+  const [player, setPlayer] = useState(posn(0, 0));
   const [playerSolved, setPlayerSolved] = useState(false);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
       case('D'):
         if (canMoveRight(player, maze)) {
           setPlayer((prev) => {
-            return { x: prev.x + 1, y: prev.y } ;
+            return posn(prev.x + 1, prev.y);
           });
         }
         break;
@@ -59,7 +60,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
       case('A'):
         if (canMoveLeft(player, maze)) {
           setPlayer((prev) => {
-            return { x: prev.x - 1, y: prev.y };
+            return posn(prev.x - 1, prev.y);
           });
         }
         break;
@@ -67,7 +68,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
       case('W'):
         if (canMoveUp(player, maze)) {
           setPlayer((prev) => {
-            return { x: prev.x, y: prev.y - 1 };
+            return posn(prev.x, prev.y - 1);
           });
         }
         break;
@@ -75,7 +76,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
       case('S'):
         if (canMoveDown(player, maze)) {
           setPlayer((prev) => {
-            return { x: prev.x, y: prev.y + 1 };
+            return posn(prev.x, prev.y + 1);
           });
         }
         break;
@@ -83,7 +84,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   }
 
   useEffect(() => {
-    setPlayer({ x: 0, y: 0 });
+    setPlayer(posn(0, 0));
   }, [maze])
 
   useEffect(() => {

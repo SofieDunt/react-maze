@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import MazeDisplay from "./components/mazeDisplay/mazeDisplay";
-import constructMaze from "./logic/mazeConstructor";
+import constructMaze from "./logic/constructMaze";
 import Maze from "./logic/maze";
 import styled from "styled-components";
 import {InlineDisplay, InlineHeader, InlineText} from "./components/utilComponents";

@@ -2,8 +2,8 @@ import Node, {NodeType} from "../../logic/node";
 import styled from "styled-components";
 import {BORDER_COLOR, FINISH_COLOR, STANDARD_COLOR, START_COLOR} from "../../theme";
 import {ScaledDisplayProps, getCellDim} from "../types";
-import {hasPathToBottom, hasPathToRight} from "../../logic/utils";
 import Maze from "../../logic/maze";
+import {hasPathToBottom, hasPathToRight} from "../../logic/navigate";
 
 interface NodeDisplayProps extends ScaledDisplayProps {
   readonly node: Node;

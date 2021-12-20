@@ -1,9 +1,14 @@
-import Node, {node, NodeType} from "./node";
-import Edge, {edge} from "./edge";
-import {cycles, findParent, getRandomInt, lolLength} from "./utils";
-import {MinHeapImpl} from "./dataStructures/heap";
-import Maze, {maze} from "./maze";
+import Node, {node, NodeType} from "../node";
+import Edge, {edge} from "../edge";
+import {findParent, getRandomInt, IdMap, lolLength} from "../utils";
+import {MinHeapImpl} from "../generic/heap";
+import Maze, {maze} from "../maze";
 import EdgeComparator from "./edgeComparator";
+import Posn, {posn} from "../generic/posn";
+
+function posToNode(pos: Posn, xDim: number): number {
+  return pos.x + pos.y * xDim;
+}
 
 /**
  * Constructs every node in the board of the given dimensions.
@@ -17,15 +22,15 @@ function constructNodes(xDim: number, yDim: number): Node[] {
   let id = 0;
   for (let row = 0; row < yDim; row++) {
     for (let col = 0; col < xDim; col++) {
-      nodes.push(node(id, { x: col, y: row }, NodeType.UNDISCOVERED));
+      nodes.push(node(id, posn(col, row), NodeType.UNDISCOVERED));
       id++;
     }
   }
 
   nodes.shift();
-  nodes.unshift(node(0, { x: 0, y: 0 }, NodeType.START));
+  nodes.unshift(node(0, posn(0, 0), NodeType.START));
   nodes.pop();
-  nodes.push(node(numNodes - 1, { x: xDim -1, y: yDim - 1 }, NodeType.FINISH));
+  nodes.push(node(numNodes - 1, posn(xDim -1, yDim - 1), NodeType.FINISH));
   return nodes;
 }
 
@@ -53,6 +58,15 @@ function constructEdges(nodes: Node[], xDim: number, yDim: number, horizontalCap
     edges.push(nodeEdges);
   });
   return edges;
+}
+
+/**
+ * Is this edge part of a cycle?
+ * @param parents the parents of each node
+ * @param edge the edge
+ */
+export function cycles(parents: IdMap, edge: Edge): boolean {
+  return findParent(parents, edge.first) === findParent(parents, edge.second);
 }
 
 /**
@@ -97,5 +111,5 @@ export default function constructMaze(xDim: number, yDim: number, bias: number):
 
   const nodes = constructNodes(xDim, yDim);
   const edges = constructMST(constructEdges(nodes, xDim, yDim, horizontalCap, verticalCap), nodes.length);
-  return maze(nodes, edges, xDim, yDim);
+  return maze(nodes, edges, xDim, yDim, posToNode);
 }

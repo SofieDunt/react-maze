@@ -1,5 +1,4 @@
-import Posn from "./dataStructures/posn";
-import {FINISH_COLOR, STANDARD_COLOR, START_COLOR} from "../theme";
+import Posn from "./generic/posn";
 
 /**
  * A unique node at an (x, y) position.

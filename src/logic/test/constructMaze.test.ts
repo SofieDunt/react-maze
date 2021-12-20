@@ -1,4 +1,4 @@
-import constructMaze from "../mazeConstructor";
+import constructMaze from "../constructMaze";
 import {lolLength} from "../utils";
 
 describe('MazeConstructor tests', () => {

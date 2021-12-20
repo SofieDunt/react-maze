@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import styled from "styled-components";
 import {InlineDisplay, InlineHeader} from "../utilComponents";
-import constructMaze from "../../logic/mazeConstructor";
+import constructMaze from "../../logic/constructMaze";
 import {SetAppProps} from "../../App";
 
 const Input = styled.input`

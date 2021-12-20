@@ -1,5 +1,5 @@
-import Edge from "./edge";
-import Comparator from "./dataStructures/comparator";
+import Edge from "../edge";
+import Comparator from "../generic/comparator";
 
 /**
  * Compares edges by their weight.

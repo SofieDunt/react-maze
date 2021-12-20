@@ -1,5 +1,5 @@
-import {MinHeapImpl} from "../dataStructures/heap";
-import Comparator from "../dataStructures/comparator";
+import {MinHeapImpl} from "../generic/heap";
+import Comparator from "../generic/comparator";
 
 describe('Heap tests', () => {
   class NumericComparator implements Comparator<number> {
