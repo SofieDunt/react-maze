@@ -5,11 +5,11 @@ import NodeDisplay from "../nodeDisplay";
 import PlayerDisplay from "../playerDisplay";
 import {ScaledDisplayProps} from "../types";
 import {canMoveDown, canMoveLeft, canMoveRight, canMoveUp} from "../../logic/navigate";
-import {posn} from "../../logic/generic/posn";
+import Posn, {posn} from "../../logic/generic/posn";
 import {bfsFinish, dfsFinish, SearchResult} from "../../logic/search";
+import {BORDER_COLOR} from "../../theme";
 
-interface MazeDisplayContainerProps extends ScaledDisplayProps, MazeDisplayProps{
-}
+type MazeDisplayContainerProps = ScaledDisplayProps & MazeDisplayProps;
 
 const getMazeDisplayXDim = (props: MazeDisplayContainerProps) => {
   return props.maze.xDim * props.cellDim;
@@ -29,7 +29,7 @@ const MazeDisplayContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-content: stretch;
-  border: 5px solid black;
+  border: 5px solid ${BORDER_COLOR};
 `;
 
 interface MazeDisplayProps {
@@ -40,9 +40,9 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   const [cellDim, setCellDim] = useState(0);
   const [player, setPlayer] = useState(posn(0, 0));
   const [playerSolved, setPlayerSolved] = useState(false);
+  const [playerFound, setPlayerFound] = useState(new Set<number>());
   const [searchResult, setSearchResult] = useState<SearchResult>({ found: [], path: [] });
   const [timeoutId, setTimeoutId] = useState<any>();
-
   const delay = 300;
 
   const resetSearch = () => {
@@ -51,72 +51,78 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   }
 
   useEffect(() => {
-    clearTimeout(timeoutId);
     setSearchResult({ found: [], path: [] });
+    setPlayer(posn(0, 0));
+    setPlayerFound(new Set<number>());
   }, [maze])
 
-  useEffect(() => {
-    if (player.x === maze.xDim - 1 && player.y === maze.yDim - 1) {
+  const onPlayerFind = (found: Posn): void => {
+    setPlayer(found);
+    playerFound.add(maze.posToNode.find(found));
+    onPlayerSolve(found);
+  }
+
+  const onPlayerSolve = (pos: Posn): void => {
+    if (pos.x === maze.xDim - 1 && pos.y === maze.yDim - 1) {
       setPlayerSolved(true);
+      const path = bfsFinish(maze).path;
+      resetSearch();
+
+      const playerFoundArray: number[] = [];
+      playerFound.forEach((val) => playerFoundArray.push(val));
+      setSearchResult({found: playerFoundArray, path: []});
+      setTimeoutId(setTimeout(() => setSearchResult({
+        found: playerFoundArray,
+        path
+      }), delay * playerFoundArray.length));
     }
-  }, [player, maze]);
+  }
+
+  const onFinishSearch = (result: SearchResult): void => {
+    resetSearch();
+    setTimeoutId(setTimeout(() => setSearchResult({ found: result.found, path: [] }), 1));
+    setTimeoutId(setTimeout(() => setSearchResult(result), delay * result.found.length));
+  }
 
   const onKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
       case ('ArrowRight'):
-      case('D'):
+      case('d'):
         if (canMoveRight(player, maze)) {
-          setPlayer((prev) => {
-            return posn(prev.x + 1, prev.y);
-          });
+          onPlayerFind(posn(player.x + 1, player.y));
         }
         break;
       case ('ArrowLeft'):
-      case('A'):
+      case('a'):
         if (canMoveLeft(player, maze)) {
-          setPlayer((prev) => {
-            return posn(prev.x - 1, prev.y);
-          });
+          onPlayerFind(posn(player.x - 1, player.y));
         }
         break;
       case ('ArrowUp'):
-      case('W'):
+      case('w'):
         if (canMoveUp(player, maze)) {
-          setPlayer((prev) => {
-            return posn(prev.x, prev.y - 1);
-          });
+          onPlayerFind(posn(player.x, player.y - 1));
         }
         break;
       case ('ArrowDown'):
-      case('S'):
+      case('s'):
         if (canMoveDown(player, maze)) {
-          setPlayer((prev) => {
-            return posn(prev.x, prev.y + 1);
-          });
+          onPlayerFind(posn(player.x, player.y + 1));
         }
         break;
       case ('b'):
-        resetSearch();
-        const bfsResult = bfsFinish(maze);
-        setTimeoutId(setTimeout(() => setSearchResult({ found: bfsResult.found, path: [] }), 1));
-        setTimeoutId(setTimeout(() => setSearchResult(bfsResult), delay * bfsResult.found.length));
+        onFinishSearch(bfsFinish(maze));
         break;
       case ('f'):
-        resetSearch();
-        const dfsResult = dfsFinish(maze);
-        setTimeoutId(setTimeout(() => setSearchResult({ found: dfsResult.found, path: [] }), 1));
-        setTimeoutId(setTimeout(() => setSearchResult(dfsResult), delay * dfsResult.found.length));
+        onFinishSearch(dfsFinish(maze));
         break;
       case ('r'):
         resetSearch();
         setPlayer(posn(0, 0));
+        setPlayerFound(new Set<number>());
         break;
     }
   }
-
-  useEffect(() => {
-    setPlayer(posn(0, 0));
-  }, [maze])
 
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown);
