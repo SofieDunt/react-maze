@@ -10,9 +10,13 @@ export default interface Maze {
   readonly edges: Edge[][];
   readonly xDim: number;
   readonly yDim: number;
-  readonly posToNode: (pos: Posn, xDim: number) => number;
+  readonly posToNode: PosToNode;
 }
 
-export function maze(nodes: Node[], edges: Edge[][], xDim: number, yDim: number, posToNode: (pos: Posn, xDim: number) => number): Maze {
+export function maze(nodes: Node[], edges: Edge[][], xDim: number, yDim: number, posToNode: PosToNode): Maze {
   return { nodes, edges, xDim, yDim, posToNode };
+}
+
+export interface PosToNode {
+  readonly find: (pos: Posn) => number;
 }

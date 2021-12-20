@@ -6,6 +6,7 @@ import PlayerDisplay from "../playerDisplay";
 import {ScaledDisplayProps} from "../types";
 import {canMoveDown, canMoveLeft, canMoveRight, canMoveUp} from "../../logic/navigate";
 import {posn} from "../../logic/generic/posn";
+import {bfsFinish, dfsFinish, SearchResult} from "../../logic/search";
 
 interface MazeDisplayContainerProps extends ScaledDisplayProps, MazeDisplayProps{
 }
@@ -39,14 +40,28 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   const [cellDim, setCellDim] = useState(0);
   const [player, setPlayer] = useState(posn(0, 0));
   const [playerSolved, setPlayerSolved] = useState(false);
+  const [searchResult, setSearchResult] = useState<SearchResult>({ found: [], path: [] });
+  const [timeoutId, setTimeoutId] = useState<any>();
+
+  const delay = 300;
+
+  const resetSearch = () => {
+    clearTimeout(timeoutId);
+    setSearchResult({ found: [], path: [] });
+  }
+
+  useEffect(() => {
+    clearTimeout(timeoutId);
+    setSearchResult({ found: [], path: [] });
+  }, [maze])
 
   useEffect(() => {
     if (player.x === maze.xDim - 1 && player.y === maze.yDim - 1) {
       setPlayerSolved(true);
     }
-  }, [player, maze])
+  }, [player, maze]);
 
-  const moveOnKeyDown = (e: KeyboardEvent) => {
+  const onKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
       case ('ArrowRight'):
       case('D'):
@@ -80,6 +95,22 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
           });
         }
         break;
+      case ('b'):
+        resetSearch();
+        const bfsResult = bfsFinish(maze);
+        setTimeoutId(setTimeout(() => setSearchResult({ found: bfsResult.found, path: [] }), 1));
+        setTimeoutId(setTimeout(() => setSearchResult(bfsResult), delay * bfsResult.found.length));
+        break;
+      case ('f'):
+        resetSearch();
+        const dfsResult = dfsFinish(maze);
+        setTimeoutId(setTimeout(() => setSearchResult({ found: dfsResult.found, path: [] }), 1));
+        setTimeoutId(setTimeout(() => setSearchResult(dfsResult), delay * dfsResult.found.length));
+        break;
+      case ('r'):
+        resetSearch();
+        setPlayer(posn(0, 0));
+        break;
     }
   }
 
@@ -88,8 +119,8 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
   }, [maze])
 
   useEffect(() => {
-    window.addEventListener('keydown', moveOnKeyDown);
-    return () => window.removeEventListener('keydown', moveOnKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   })
 
   useEffect(() => {
@@ -109,10 +140,11 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
         {playerSolved && <p>Maze solved!</p>}
         <MazeDisplayContainer maze={maze} cellDim={cellDim}>
           {maze.nodes.map((node, id) => {
-            return <NodeDisplay key={id} node={node} maze={maze} cellDim={cellDim} />
+            return <NodeDisplay key={id} className={(searchResult.found.includes(id) ? 'found' : '') + (searchResult.path.includes(id) ? ' path' : '')} node={node} maze={maze} found={searchResult.found} path={searchResult.path} cellDim={cellDim} delay={delay} />
           })}
           <PlayerDisplay cellDim={cellDim} player={player} />
         </MazeDisplayContainer>
+        <p>Press f to solve the maze with DFS, b to solve the maze with BFS, or r to reset the maze!</p>
       </>
   );
 }

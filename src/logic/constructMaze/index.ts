@@ -4,11 +4,8 @@ import {findParent, getRandomInt, IdMap, lolLength} from "../utils";
 import {MinHeapImpl} from "../generic/heap";
 import Maze, {maze} from "../maze";
 import EdgeComparator from "./edgeComparator";
-import Posn, {posn} from "../generic/posn";
-
-function posToNode(pos: Posn, xDim: number): number {
-  return pos.x + pos.y * xDim;
-}
+import {posn} from "../generic/posn";
+import PosToNodeImpl from "./posToNodeImpl";
 
 /**
  * Constructs every node in the board of the given dimensions.
@@ -87,10 +84,11 @@ function constructMST(edges: Edge[][], numNodes: number): Edge[][] {
     })
   });
 
-  while (lolLength(treeEdges) < numTreeEdges) {
+  while (lolLength(treeEdges) < numTreeEdges * 2) {
     const nextEdge = worklist.extractRoot();
     if (nextEdge && !cycles(parents, nextEdge)) {
       treeEdges[nextEdge.first].push(nextEdge);
+      treeEdges[nextEdge.second].push(edge(nextEdge.second, nextEdge.first, nextEdge.weight));
       parents.set(findParent(parents, nextEdge.first), findParent(parents, nextEdge.second));
     }
   }
@@ -111,5 +109,5 @@ export default function constructMaze(xDim: number, yDim: number, bias: number):
 
   const nodes = constructNodes(xDim, yDim);
   const edges = constructMST(constructEdges(nodes, xDim, yDim, horizontalCap, verticalCap), nodes.length);
-  return maze(nodes, edges, xDim, yDim, posToNode);
+  return maze(nodes, edges, xDim, yDim, new PosToNodeImpl(xDim));
 }

@@ -26,20 +26,20 @@ export function hasPathToBottom(node: Node, maze: Maze): boolean {
 
 export function canMoveUp(pos: Posn, maze: Maze): boolean {
   const up = pos.y - 1;
-  return up >= 0 && hasPathToBottom(maze.nodes[maze.posToNode(pos, maze.xDim) - maze.xDim], maze);
+  return up >= 0 && hasPathToBottom(maze.nodes[maze.posToNode.find(pos) - maze.xDim], maze);
 }
 
 export function canMoveDown(pos: Posn, maze: Maze): boolean {
   const down = pos.y + 1;
-  return down < maze.yDim && hasPathToBottom(maze.nodes[maze.posToNode(pos, maze.xDim)], maze);
+  return down < maze.yDim && hasPathToBottom(maze.nodes[maze.posToNode.find(pos)], maze);
 }
 
 export function canMoveLeft(pos: Posn, maze: Maze): boolean {
   const left = pos.x - 1;
-  return left >= 0 && hasPathToRight(maze.nodes[maze.posToNode(pos, maze.xDim) - 1], maze);
+  return left >= 0 && hasPathToRight(maze.nodes[maze.posToNode.find(pos) - 1], maze);
 }
 
 export function canMoveRight(pos: Posn, maze: Maze): boolean {
   const right = pos.x + 1;
-  return right < maze.xDim && hasPathToRight(maze.nodes[maze.posToNode(pos, maze.xDim)], maze);
+  return right < maze.xDim && hasPathToRight(maze.nodes[maze.posToNode.find(pos)], maze);
 }
