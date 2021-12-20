@@ -5,7 +5,6 @@ import {getCellDim, ScaledDisplayProps} from "../types";
 
 interface PlayerDisplayProps extends ScaledDisplayProps {
   readonly player: Posn;
-  readonly cellDim: number;
 }
 
 const getTop = (props: PlayerDisplayProps) => {

@@ -6,11 +6,9 @@ import Comparator from "./dataStructures/comparator";
  */
 class EdgeComparator implements Comparator<Edge> {
   compare(one: Edge, two: Edge): number {
-    const oneWeight = one.getWeight();
-    const twoWeight = two.getWeight();
-    if (oneWeight === twoWeight) {
+    if (one.weight === two.weight) {
       return 0;
-    } else if (oneWeight < twoWeight) {
+    } else if (one.weight < two.weight) {
       return -1;
     } else {
       return 1;

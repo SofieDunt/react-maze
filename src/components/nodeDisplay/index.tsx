@@ -1,31 +1,40 @@
-import Node from "../../logic/node";
-import Edge from "../../logic/edge";
+import Node, {NodeType} from "../../logic/node";
 import styled from "styled-components";
-import {BORDER_COLOR} from "../../theme";
+import {BORDER_COLOR, FINISH_COLOR, STANDARD_COLOR, START_COLOR} from "../../theme";
 import {ScaledDisplayProps, getCellDim} from "../types";
+import {hasPathToBottom, hasPathToRight} from "../../logic/utils";
+import Maze from "../../logic/maze";
 
 interface NodeDisplayProps extends ScaledDisplayProps {
   readonly node: Node;
-  readonly edges: Edge[][];
-  readonly xDim: number;
-  readonly yDim: number;
+  readonly maze: Maze;
 }
 
-const getColor = (props: NodeDisplayProps) => {
-  return props.node.getColor();
+export function getNodeColor(props: NodeDisplayProps): string {
+  switch (props.node.type) {
+    case NodeType.START:
+      return START_COLOR;
+    case NodeType.FINISH:
+      return FINISH_COLOR;
+    case NodeType.FOUND:
+      return 'blue';
+    case NodeType.UNDISCOVERED:
+    default:
+      return STANDARD_COLOR;
+  }
 }
 
 const getRightBorderColor = (props: NodeDisplayProps) => {
-  if (props.node.hasPathToRight(props.edges, props.xDim)) {
-    return props.node.getColor();
+  if (hasPathToRight(props.node, props.maze)) {
+    return getNodeColor(props);
   } else {
     return BORDER_COLOR;
   }
 }
 
 const getBottomBorderColor = (props: NodeDisplayProps) => {
-  if (props.node.hasPathToBottom(props.edges, props.xDim, props.yDim)) {
-    return props.node.getColor();
+  if (hasPathToBottom(props.node, props.maze)) {
+    return getNodeColor(props);
   } else {
     return BORDER_COLOR;
   }
@@ -36,7 +45,7 @@ const NodeDisplay = styled.div`
   flex-grow: 1;
   width: ${getCellDim}px;
   height: ${getCellDim}px;
-  background: ${getColor};
+  background: ${getNodeColor};
   border-right: solid 3px ${getRightBorderColor};
   border-bottom: solid 3px ${getBottomBorderColor};
 `;

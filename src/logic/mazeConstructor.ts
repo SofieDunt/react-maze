@@ -1,128 +1,101 @@
-import Node, {NodeImpl, NodeType} from "./node";
-import Edge, {EdgeImpl} from "./edge";
-import Posn from "./dataStructures/posn";
-import {findParent, getRandomInt, lolLength} from "./utils";
+import Node, {node, NodeType} from "./node";
+import Edge, {edge} from "./edge";
+import {cycles, findParent, getRandomInt, lolLength} from "./utils";
 import {MinHeapImpl} from "./dataStructures/heap";
-import Maze from "./maze";
+import Maze, {maze} from "./maze";
 import EdgeComparator from "./edgeComparator";
 
 /**
- * Constructs a maze.
+ * Constructs every node in the board of the given dimensions.
+ * @param xDim the x-dimension of the board
+ * @param yDim the y-dimension of the board
  */
-export interface MazeConstructor {
-  /**
-   * Constructs a maze.
-   */
-  readonly construct: () => Maze;
+function constructNodes(xDim: number, yDim: number): Node[] {
+  const nodes: Node[] = [];
+  const numNodes = xDim * yDim;
+
+  let id = 0;
+  for (let row = 0; row < yDim; row++) {
+    for (let col = 0; col < xDim; col++) {
+      nodes.push(node(id, { x: col, y: row }, NodeType.UNDISCOVERED));
+      id++;
+    }
+  }
+
+  nodes.shift();
+  nodes.unshift(node(0, { x: 0, y: 0 }, NodeType.START));
+  nodes.pop();
+  nodes.push(node(numNodes - 1, { x: xDim -1, y: yDim - 1 }, NodeType.FINISH));
+  return nodes;
 }
 
-export class MazeConstructorImpl implements MazeConstructor {
-  private readonly xDim: number;
-  private readonly yDim: number;
-  private readonly horizontalCap: number;
-  private readonly verticalCap: number;
+/**
+ * Constructs every potential (to right or to bottom) edge between the given nodes.
+ * @param nodes the nodes in the board
+ * @param xDim the x-dimension of the board
+ * @param yDim the y-dimension of the board
+ * @param horizontalCap the cap on horizontal edge weights
+ * @param verticalCap the cap on vertical edge weights
+ */
+function constructEdges(nodes: Node[], xDim: number, yDim: number, horizontalCap: number, verticalCap: number): Edge[][] {
+  const edges: Edge[][] = [];
+  nodes.forEach((node: Node, id) => {
+    const nodeEdges = [];
+    const pos = node.pos;
+    // right neighbor
+    if (pos.x % xDim + 1 < xDim) {
+      nodeEdges.push(edge(id, id + 1, getRandomInt(horizontalCap)));
+    }
+    // bottom neighbor
+    if (pos.y % yDim + 1 < yDim) {
+      nodeEdges.push(edge(id, id + xDim, getRandomInt(verticalCap)));
+    }
+    edges.push(nodeEdges);
+  });
+  return edges;
+}
 
-  constructor(xDim: number, yDim: number, bias: number) {
-    this.xDim = xDim;
-    this.yDim = yDim;
-    if (bias === 0) {
-      this.horizontalCap = 100;
-      this.verticalCap = 100;
-    } else if (bias < 0) {
-      this.horizontalCap = 50;
-      this.verticalCap = 100 * Math.abs(bias);
-    } else {
-      this.horizontalCap = 100 * bias;
-      this.verticalCap = 50;
+/**
+ * Uses Kruskal's to make an MST from all potential edges.
+ * @param edges all potential edges in the board
+ * @param numNodes the number of nodes in the board
+ */
+function constructMST(edges: Edge[][], numNodes: number): Edge[][] {
+  const numTreeEdges = numNodes - 1;
+  const treeEdges: Edge[][] = [];
+  const parents = new Map<number, number>();
+  edges.forEach((es, id) => parents.set(id, id));
+  const worklist = new MinHeapImpl(new EdgeComparator());
+  edges.forEach((es) => {
+    treeEdges.push([]);
+    es.forEach((edge) => {
+      worklist.insert(edge);
+    })
+  });
+
+  while (lolLength(treeEdges) < numTreeEdges) {
+    const nextEdge = worklist.extractRoot();
+    if (nextEdge && !cycles(parents, nextEdge)) {
+      treeEdges[nextEdge.first].push(nextEdge);
+      parents.set(findParent(parents, nextEdge.first), findParent(parents, nextEdge.second));
     }
   }
 
-  /**
-   * Creates and returns a node.
-   * @param id the node id
-   * @param pos the node position
-   * @param type the node type
-   */
-  private static node(id: number, pos: Posn, type: NodeType): Node {
-    return new NodeImpl(id, pos, type);
+  return treeEdges;
+}
+
+export default function constructMaze(xDim: number, yDim: number, bias: number): Maze {
+  let horizontalCap = 100;
+  let verticalCap = 100;
+  if (bias < 0) {
+    horizontalCap = 50;
+    verticalCap = 100 * Math.abs(bias);
+  } else if (bias > 0) {
+    horizontalCap = 100 * bias;
+    verticalCap = 50;
   }
 
-  /**
-   * Constructs every node in the board.
-   */
-  private constructNodes(): Node[] {
-    const nodes: Node[] = [];
-    const numNodes = this.xDim * this.yDim;
-
-    let id = 0;
-    for (let row = 0; row < this.yDim; row++) {
-      for (let col = 0; col < this.xDim; col++) {
-        nodes.push(MazeConstructorImpl.node(id, { x: col, y: row }, NodeType.UNDISCOVERED));
-        id++;
-      }
-    }
-
-    nodes.shift();
-    nodes.unshift(MazeConstructorImpl.node(0, { x: 0, y: 0 }, NodeType.START));
-    nodes.pop();
-    nodes.push(MazeConstructorImpl.node(numNodes - 1, { x: this.xDim -1, y: this.yDim - 1 }, NodeType.FINISH));
-    return nodes;
-  }
-
-  /**
-   * Constructs every potential edge in the board.
-   * @param nodes the nodes in the board
-   */
-  private constructEdges(nodes: Node[]): Edge[][] {
-    const edges: Edge[][] = [];
-    nodes.forEach((node: Node, id) => {
-      const nodeEdges = [];
-      const pos = node.getPos();
-      // right neighbor
-      if (pos.x % this.xDim + 1 < this.xDim) {
-        nodeEdges.push(new EdgeImpl(id, id + 1, getRandomInt(this.horizontalCap)));
-      }
-      // bottom neighbor
-      if (pos.y % this.yDim + 1 < this.yDim) {
-        nodeEdges.push(new EdgeImpl(id, id + this.xDim, getRandomInt(this.verticalCap)));
-      }
-      edges.push(nodeEdges);
-    });
-    return edges;
-  }
-
-  /**
-   * Uses Kruskal's to make an MST from all potential edges.
-   * @param edges all potential edges in the board
-   */
-  private makeSpanningTree(edges: Edge[][]): Edge[][] {
-    const numTreeEdges = this.xDim * this.yDim - 1;
-    const treeEdges: Edge[][] = [];
-    const parents = new Map<number, number>();
-    edges.forEach((es, id) => parents.set(id, id));
-    const worklist = new MinHeapImpl(new EdgeComparator());
-    edges.forEach((es) => {
-      treeEdges.push([]);
-      es.forEach((edge) => {
-        worklist.insert(edge);
-      })
-    });
-
-    while (lolLength(treeEdges) < numTreeEdges) {
-      const nextEdge = worklist.extractRoot();
-      if (nextEdge && !nextEdge.cycles(parents)) {
-        const pair = nextEdge.getNodes();
-        treeEdges[pair.first].push(nextEdge);
-        parents.set(findParent(parents, pair.first), findParent(parents, pair.second));
-      }
-    }
-
-    return treeEdges;
-  }
-
-  construct(): Maze {
-    const nodes = this.constructNodes();
-    const edges = this.makeSpanningTree(this.constructEdges(nodes));
-    return { nodes, edges };
-  }
+  const nodes = constructNodes(xDim, yDim);
+  const edges = constructMST(constructEdges(nodes, xDim, yDim, horizontalCap, verticalCap), nodes.length);
+  return maze(nodes, edges, xDim, yDim);
 }

@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import styled from "styled-components";
 import {InlineDisplay, InlineHeader} from "../utilComponents";
-import {MazeConstructorImpl} from "../../logic/mazeConstructor";
+import constructMaze from "../../logic/mazeConstructor";
 import {SetAppProps} from "../../App";
 
 const Input = styled.input`
@@ -21,7 +21,7 @@ const MakeMazeForm: React.FC<FormProps> = ({ setter }) => {
     if (Number.isInteger(xDimInput) && xDimInput > 0
         && Number.isInteger(yDimInput) && yDimInput > 0
         && Number.isInteger(biasInput)) {
-      setter.setMaze(new MazeConstructorImpl(xDimInput, yDimInput, biasInput).construct());
+      setter.setMaze(constructMaze(xDimInput, yDimInput, biasInput));
       setter.setXDim(xDimInput);
       setter.setYDim(yDimInput);
       setter.setBias(biasInput);

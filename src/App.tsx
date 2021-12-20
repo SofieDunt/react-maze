@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import MazeDisplay from "./components/mazeDisplay/mazeDisplay";
-import {MazeConstructorImpl} from "./logic/mazeConstructor";
+import constructMaze from "./logic/mazeConstructor";
 import Maze from "./logic/maze";
 import styled from "styled-components";
 import {InlineDisplay, InlineHeader, InlineText} from "./components/utilComponents";
@@ -27,7 +27,7 @@ const App = () => {
   const [xDim, setXDim] = useState(5);
   const [yDim, setYDim] = useState(5);
   const [bias, setBias] = useState(0);
-  const [maze, setMaze] = useState<Maze>(new MazeConstructorImpl(xDim, yDim, bias).construct());
+  const [maze, setMaze] = useState<Maze>(constructMaze(xDim, yDim, bias));
 
   const setter: SetAppProps = { setXDim, setYDim, setBias, setMaze };
 
@@ -61,7 +61,7 @@ const App = () => {
 
       <MakeMazeForm setter={setter} />
 
-      {maze && <MazeDisplay maze={maze} xDim={xDim} yDim={yDim} /> }
+      {maze && <MazeDisplay maze={maze} /> }
     </AppContainer>
   );
 }
