@@ -20,16 +20,21 @@ const getMazeDisplayYDim = (props: MazeDisplayContainerProps) => {
 }
 
 const MazeDisplayContainer = styled.div`
-  display: block;
   position: relative;
-  left: 50%;
-  transform: translate(-50%, 0);
+  min-width: ${getMazeDisplayXDim}px;
   width: ${getMazeDisplayXDim}px;
   height: ${getMazeDisplayYDim}px;
   display: flex;
   flex-wrap: wrap;
   align-content: stretch;
   border: 5px solid ${BORDER_COLOR};
+`;
+
+const SolvedBanner = styled.div`
+  height: 45px;
+  min-width: 100%;
+  line-height: 45px;
+  font-size: 19px;
 `;
 
 interface MazeDisplayProps {
@@ -119,6 +124,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
       case ('r'):
         resetSearch();
         setPlayer(posn(0, 0));
+        setPlayerSolved(false);
         setPlayerFound(new Set<number>());
         break;
     }
@@ -133,7 +139,7 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
     const calcCellDim = () => {
       const width = window.innerWidth - 50;
       const height = window.innerHeight - 250;
-      setCellDim(Math.min(width / maze.xDim, height / maze.yDim));
+      setCellDim(Math.max(Math.min(width / maze.xDim, height / maze.yDim), 20));
     }
 
     calcCellDim();
@@ -143,14 +149,15 @@ const MazeDisplay: React.FC<MazeDisplayProps> = ({ maze}) => {
 
   return (
       <>
-        {playerSolved && <p>Maze solved!</p>}
+        <SolvedBanner>
+          <p>{playerSolved && 'Maze solved!'}</p>
+        </SolvedBanner>
         <MazeDisplayContainer maze={maze} cellDim={cellDim}>
           {maze.nodes.map((node, id) => {
             return <NodeDisplay key={id} className={(searchResult.found.includes(id) ? 'found' : '') + (searchResult.path.includes(id) ? ' path' : '')} node={node} maze={maze} found={searchResult.found} path={searchResult.path} cellDim={cellDim} delay={delay} />
           })}
-          <PlayerDisplay cellDim={cellDim} player={player} />
+          <PlayerDisplay cellDim={cellDim} player={player} maze={maze} />
         </MazeDisplayContainer>
-        <p>Press f to solve the maze with DFS, b to solve the maze with BFS, or r to reset the maze!</p>
       </>
   );
 }

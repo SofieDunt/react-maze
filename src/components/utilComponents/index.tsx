@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const InlineText = styled.p`
   display: inline-block;
-  margin: 10px;
+  margin: 0;
 `;
 
 export const InlineHeader = styled(InlineText)`
@@ -12,5 +12,5 @@ export const InlineHeader = styled(InlineText)`
 
 export const InlineDisplay = styled.div`
   display: inline-block;
-  margin: 0 20px;
+  margin-right: 20px;
 `;

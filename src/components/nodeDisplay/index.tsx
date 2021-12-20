@@ -88,7 +88,7 @@ const getFoundDelay = (props: NodeDisplayProps) => {
 
 const getPathDelay = (props: NodeDisplayProps) => {
   if (props.path.includes(props.node.id)) {
-    return (props.path.length * props.delay) -  (props.path.findIndex((value => { return value === props.node.id})) * props.delay);
+    return ((props.path.length * props.delay) -  (props.path.findIndex((value => { return value === props.node.id})) * props.delay)) / 2;
   } else {
     return 0;
   }

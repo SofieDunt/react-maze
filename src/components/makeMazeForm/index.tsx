@@ -3,9 +3,37 @@ import styled from "styled-components";
 import {InlineDisplay, InlineHeader} from "../utilComponents";
 import constructMaze from "../../logic/constructMaze";
 import {SetAppProps} from "../../App";
+import {
+  BORDER_COLOR,
+  FOUND_COLOR,
+  PRIMARY_PLAYER_COLOR,
+  SECONDARY_PLAYER_COLOR,
+} from "../../theme";
 
 const Input = styled.input`
   width: 50px;
+  height: 20px;
+  margin-left: 5px;
+  color: ${BORDER_COLOR};
+  border-bottom: solid 2px ${FOUND_COLOR};
+  font-family: Caveat, Nunito Sans, sans-serif;
+  font-size: 25px;
+  padding: 3px;
+  text-align: center;
+  font-weight: bold;
+`;
+
+const Button = styled.button`
+  z-index: 9;
+  border: 2px solid ${FOUND_COLOR};
+  background: ${PRIMARY_PLAYER_COLOR};
+  color: ${BORDER_COLOR};
+  font-family: Nunito Sans, sans-serif;
+  padding: 5px;
+  font-size: 15px;
+  &:hover {
+    background: ${SECONDARY_PLAYER_COLOR};
+  }
 `;
 
 interface FormProps {
@@ -30,21 +58,28 @@ const MakeMazeForm: React.FC<FormProps> = ({ setter }) => {
     }
   }
 
+  const validateNumber = (val: string, callback: (num: number) => void): void => {
+    const num = Number(val);
+    if (Number.isInteger(num))  {
+      callback(num);
+    }
+  }
+
   return (
       <>
         <InlineDisplay>
           <InlineHeader>Rows:</InlineHeader>
-          <Input type={"number"} onChange={(e) => setYDimInput(Number(e.currentTarget.value))} value={yDimInput} />
+          <Input type={"text"} onChange={(e) => validateNumber(e.currentTarget.value, setYDimInput)} value={yDimInput} />
         </InlineDisplay>
         <InlineDisplay>
           <InlineHeader>Columns:</InlineHeader>
-          <Input type={"number"} onChange={(e) => setXDimInput(Number(e.currentTarget.value))} value={xDimInput} />
+          <Input type={"text"} onChange={(e) => validateNumber(e.currentTarget.value, setXDimInput)} value={xDimInput} />
         </InlineDisplay>
         <InlineDisplay>
           <InlineHeader>Bias:</InlineHeader>
-          <Input type={"number"} onChange={(e) => setBiasInput(Number(e.currentTarget.value))} value={biasInput} />
+          <Input type={"text"} onChange={(e) => validateNumber(e.currentTarget.value, setBiasInput)} value={biasInput} />
         </InlineDisplay>
-        <button onClick={onSubmit}>Make New Maze</button>
+        <Button onClick={onSubmit}>Make New Maze</Button>
       </>
   );
 }
