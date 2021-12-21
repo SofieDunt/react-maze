@@ -4,7 +4,7 @@ import {
   BORDER_COLOR,
   PRIMARY_PLAYER_COLOR,
   SECONDARY_PLAYER_COLOR,
-  STANDARD_COLOR, TERTIARY_PLAYER_COLOR
+  TERTIARY_PLAYER_COLOR
 } from "../../theme";
 import {getCellDim, ScaledDisplayProps} from "../types";
 import Maze from "../../logic/maze";

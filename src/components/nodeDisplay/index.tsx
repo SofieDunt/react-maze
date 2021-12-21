@@ -6,7 +6,7 @@ import {
   FOUND_COLOR,
   PATH_COLOR,
   STANDARD_COLOR,
-  START_COLOR
+  START_COLOR,
 } from "../../theme";
 import {ScaledDisplayProps, getCellDim} from "../types";
 import Maze from "../../logic/maze";
@@ -47,12 +47,8 @@ const getRightBorderColorStandard = (props: NodeDisplayProps) => {
   return getRightBorderColor(props, () => getNodeColor(props));
 }
 
-const getRightBorderColorFound = (props: NodeDisplayProps) => {
-  return getRightBorderColor(props, () => { return FOUND_COLOR });
-}
-
-const getRightBorderColorPath = (props: NodeDisplayProps) => {
-  return getRightBorderColor(props, () => { return PATH_COLOR });
+const getRightBorderColorUnique = (props: NodeDisplayProps, color: string) => {
+  return getRightBorderColor(props, () => { return color });
 }
 
 const getBottomBorderColor = (props: NodeDisplayProps, connectedColor: () => string) => {
@@ -67,12 +63,8 @@ const getBottomBorderColorStandard = (props: NodeDisplayProps) => {
   return getBottomBorderColor(props, () => getNodeColor(props));
 }
 
-const getBottomBorderColorFound = (props: NodeDisplayProps) => {
-  return getBottomBorderColor(props, () => { return FOUND_COLOR });
-}
-
-const getBottomBorderColorPath = (props: NodeDisplayProps) => {
-  return getBottomBorderColor(props, () => { return PATH_COLOR });
+const getBottomBorderColorUnique = (props: NodeDisplayProps, color: string) => {
+  return getBottomBorderColor(props, () => { return color });
 }
 
 const getDelay = (props: NodeDisplayProps) => {
@@ -105,18 +97,24 @@ const NodeDisplay = styled.div`
   background: ${getNodeColor};
   border-right: solid 3px ${getRightBorderColorStandard};
   border-bottom: solid 3px ${getBottomBorderColorStandard};
+   
+  &.player-found {
+    background: ${START_COLOR};
+    border-right: solid 3px ${(props) => getRightBorderColorUnique(props, START_COLOR)};
+    border-bottom: solid 3px ${(props) => getBottomBorderColorUnique(props, START_COLOR)};
+  }
   
   &.found {
     background: ${FOUND_COLOR};
-    border-right: solid 3px ${getRightBorderColorFound};
-    border-bottom: solid 3px ${getBottomBorderColorFound};
+    border-right: solid 3px ${(props) => getRightBorderColorUnique(props, FOUND_COLOR)};
+    border-bottom: solid 3px ${(props) => getBottomBorderColorUnique(props, FOUND_COLOR)};
     transition: background ${getDelay}ms ${getFoundDelay}ms, border ${getDelay}ms ${getFoundDelay}ms;
   }
   
   &.path {
     background: ${PATH_COLOR};
-    border-right: solid 3px ${getRightBorderColorPath};
-    border-bottom: solid 3px ${getBottomBorderColorPath};
+    border-right: solid 3px ${(props) => getRightBorderColorUnique(props, PATH_COLOR)};
+    border-bottom: solid 3px ${(props) => getBottomBorderColorUnique(props, PATH_COLOR)};
     transition: background ${getDelay}ms ${getPathDelay}ms, border ${getDelay}ms ${getPathDelay}ms;
   }
 `;
