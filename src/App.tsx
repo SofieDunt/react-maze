@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import MazeDisplay from "./components/mazeDisplay/mazeDisplay";
 import constructMaze from "./logic/constructMaze";
 import Maze from "./logic/maze";
 import styled from "styled-components";
@@ -11,6 +10,7 @@ import {
   PRIMARY_PLAYER_COLOR,
   TERTIARY_PLAYER_COLOR
 } from "./theme";
+import GameDisplay from "./components/gameDisplay";
 
 export interface SetAppProps {
   readonly setXDim: (xDim: number) => void;
@@ -35,6 +35,7 @@ const PageTitle = styled.h1`
   background: ${PRIMARY_PLAYER_COLOR};
   color: ${TERTIARY_PLAYER_COLOR};
   padding: 10px 20px;
+  width: 100%;
 `;
 
 const SettingsContainer = styled.div`
@@ -98,7 +99,7 @@ const App = () => {
         </HeaderContainer>
 
       <MazeContainer>
-        {maze && <MazeDisplay maze={maze} /> }
+        {maze && <GameDisplay maze={maze} /> }
       </MazeContainer>
     </AppContainer>
   );

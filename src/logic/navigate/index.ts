@@ -1,6 +1,10 @@
-import Posn from "../generic/posn";
+import Posn, {posn} from "../generic/posn";
 import Maze from "../maze";
 import Node from "../node";
+
+export enum Directions {
+  LEFT, RIGHT, UP, DOWN
+}
 
 export function hasPathToRight(node: Node, maze: Maze): boolean {
   const outEdges = maze.edges[node.id];
@@ -24,22 +28,35 @@ export function hasPathToBottom(node: Node, maze: Maze): boolean {
   return bool;
 }
 
-export function canMoveUp(pos: Posn, maze: Maze): boolean {
-  const up = pos.y - 1;
-  return up >= 0 && hasPathToBottom(maze.nodes[maze.posToNode.find(pos) - maze.xDim], maze);
+export const canMove = (player: Posn, maze: Maze, direction: Directions): boolean => {
+  switch (direction) {
+    case Directions.LEFT:
+      return player.x - 1 >= 0 && hasPathToRight(maze.nodes[maze.posToNode.find(player) - 1], maze);
+    case Directions.RIGHT:
+      return player.x + 1 < maze.xDim && hasPathToRight(maze.nodes[maze.posToNode.find(player)], maze);
+    case Directions.UP:
+      return player.y - 1 >= 0 && hasPathToBottom(maze.nodes[maze.posToNode.find(player) - maze.xDim], maze);
+    case Directions.DOWN:
+      return player.y + 1 < maze.yDim && hasPathToBottom(maze.nodes[maze.posToNode.find(player)], maze);
+    default:
+      return false;
+  }
 }
-
-export function canMoveDown(pos: Posn, maze: Maze): boolean {
-  const down = pos.y + 1;
-  return down < maze.yDim && hasPathToBottom(maze.nodes[maze.posToNode.find(pos)], maze);
-}
-
-export function canMoveLeft(pos: Posn, maze: Maze): boolean {
-  const left = pos.x - 1;
-  return left >= 0 && hasPathToRight(maze.nodes[maze.posToNode.find(pos) - 1], maze);
-}
-
-export function canMoveRight(pos: Posn, maze: Maze): boolean {
-  const right = pos.x + 1;
-  return right < maze.xDim && hasPathToRight(maze.nodes[maze.posToNode.find(pos)], maze);
+export const move = (player: Posn, maze: Maze, direction: Directions): Posn => {
+  if (canMove(player, maze, direction)) {
+    switch (direction) {
+      case Directions.LEFT:
+        return posn(player.x - 1, player.y);
+      case Directions.RIGHT:
+        return posn(player.x + 1, player.y);
+      case Directions.UP:
+        return posn(player.x, player.y - 1);
+      case Directions.DOWN:
+        return posn(player.x, player.y + 1);
+      default:
+        return player;
+    }
+  } else {
+    return player;
+  }
 }

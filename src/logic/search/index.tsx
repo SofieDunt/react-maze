@@ -5,9 +5,31 @@ import BfsList from "../generic/bfsList";
 import {posn} from "../generic/posn";
 import LifoList from "../generic/lifoList";
 
+export enum SearchType {
+  NONE, BFS, DFS
+}
+
+export const searchWorklist = (type: SearchType, first: number): Worklist<number> => {
+  let n: Worklist<number>;
+  if (type === SearchType.BFS) {
+    n = new BfsList<number>();
+  } else {
+    n = new LifoList<number>();
+  }
+  if (type !== SearchType.NONE) {
+    n.add(first);
+  }
+  return n;
+}
+
 export interface SearchResult {
   readonly found: IdMap;
   readonly path: IdMap;
+}
+
+export function searchFromSource(type: SearchType, maze: Maze, source: number, target: number): SearchResult {
+  const worklist = searchWorklist(type, source);
+  return search(worklist, maze, target);
 }
 
 export function bfsFinish(maze: Maze): SearchResult {
@@ -26,10 +48,8 @@ export function search(worklist: Worklist<number>, maze: Maze, target: number): 
   const found: IdMap = new Map<number, number>();
   const parents: IdMap = new Map<number, number>();
 
-  let order = 0;
   while (!worklist.isEmpty()) {
-    searchNode(worklist, maze, target, found, parents, order);
-    order++;
+    searchNode(worklist, maze, target, found, parents);
   }
 
   return { found, path: reconstructPath(parents, maze, target) };
@@ -43,10 +63,10 @@ function getNodeNeighbors(node: number, maze: Maze): number[] {
   return neighbors;
 }
 
-function searchNode(worklist: Worklist<number>, maze: Maze, target: number, found: IdMap, parents: IdMap, order: number): void {
+export function searchNode(worklist: Worklist<number>, maze: Maze, target: number, found: IdMap, parents: IdMap): void {
   const next = worklist.removeNext();
   if (next !== null && !found.has(next)) {
-    found.set(next, order);
+    found.set(next, found.size + 1);
     if (next === target) {
       worklist.removeAll();
     } else {
