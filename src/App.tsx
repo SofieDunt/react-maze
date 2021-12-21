@@ -1,14 +1,20 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import constructMaze from "./logic/constructMaze";
 import Maze from "./logic/maze";
 import styled from "styled-components";
-import {InlineDisplay, InlineHeader, InlineText} from "./components/utilComponents";
+import {
+  InlineDisplay,
+  InlineHeader,
+  InlineText,
+} from "./components/utilComponents";
 import MakeMazeForm from "./components/makeMazeForm";
 import {
   BACKGROUND,
+  BANNER_COLOR,
   BORDER_COLOR,
   PRIMARY_PLAYER_COLOR,
-  TERTIARY_PLAYER_COLOR
+  STANDARD_COLOR,
+  TEXT_COLOR,
 } from "./theme";
 import GameDisplay from "./components/gameDisplay";
 
@@ -22,38 +28,38 @@ export interface SetAppProps {
 const AppContainer = styled.div`
   min-height: 100vh;
   font-family: Nunito Sans, sans-serif;
-  padding: 0;
   margin: 0;
   box-sizing: border-box;
   background: ${BACKGROUND};
-  color: ${BORDER_COLOR};
+  color: ${TEXT_COLOR};
   overflow: auto;
-`
+`;
 
 const PageTitle = styled.h1`
   margin-bottom: 0;
-  background: ${PRIMARY_PLAYER_COLOR};
-  color: ${TERTIARY_PLAYER_COLOR};
+  background: ${BANNER_COLOR};
+  color: ${BORDER_COLOR};
   padding: 10px 20px;
-  width: 100%;
+  min-width: 100vw;
+  box-sizing: border-box;
 `;
 
 const SettingsContainer = styled.div`
   padding: 5px 20px;
   font-size: 16px;
-  line-height: 30px;
+  line-height: 35px;
 `;
 
 const HeaderContainer = styled.div`
   box-sizing: border-box;
-  min-height: 20vh;
+  min-height: 15vh;
 `;
 
 const MazeContainer = styled.div`
   box-sizing: border-box;
   min-width: 100vw;
-  min-height: 80vh;
-  padding: 0 35px 25px;
+  min-height: 85vh;
+  padding: 0 30px 25px;
 `;
 
 const App = () => {
@@ -66,13 +72,13 @@ const App = () => {
 
   const displayBias = () => {
     if (bias < 0) {
-      return 'Horizontal (' + Math.abs(bias) + ')';
+      return "Horizontal (" + Math.abs(bias) + ")";
     } else if (bias > 0) {
-      return 'Vertical (' + Math.abs(bias) + ')';
+      return "Vertical (" + Math.abs(bias) + ")";
     } else {
-      return 'Standard';
+      return "Standard";
     }
-  }
+  };
 
   return (
     <AppContainer>
@@ -80,29 +86,19 @@ const App = () => {
         <PageTitle>Maze</PageTitle>
         <SettingsContainer>
           <div>
-          <InlineDisplay>
-            <InlineHeader>Rows: </InlineHeader>
-            <InlineText>{yDim}</InlineText>
-          </InlineDisplay>
-          <InlineDisplay>
-            <InlineHeader>Columns:</InlineHeader>
-            <InlineText>{xDim}</InlineText>
-          </InlineDisplay>
-          <InlineDisplay>
-            <InlineHeader>Setting: </InlineHeader>
-            <InlineText>{displayBias()}</InlineText>
-          </InlineDisplay>
+            <InlineDisplay>
+              <InlineHeader>
+                {yDim} x {xDim} {displayBias()}
+              </InlineHeader>
+            </InlineDisplay>
           </div>
-        <MakeMazeForm setter={setter} />
-        <p>Press f to solve the maze with DFS, b to solve the maze with BFS, or r to reset the maze!</p>
+          <MakeMazeForm setter={setter} />
         </SettingsContainer>
-        </HeaderContainer>
+      </HeaderContainer>
 
-      <MazeContainer>
-        {maze && <GameDisplay maze={maze} /> }
-      </MazeContainer>
+      <MazeContainer>{maze && <GameDisplay maze={maze} />}</MazeContainer>
     </AppContainer>
   );
-}
+};
 
 export default App;

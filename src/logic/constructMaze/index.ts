@@ -1,10 +1,10 @@
-import Node, {node, NodeType} from "../node";
-import Edge, {edge} from "../edge";
-import {findParent, getRandomInt, IdMap, lolLength} from "../utils";
-import {MinHeapImpl} from "../generic/heap";
-import Maze, {maze} from "../maze";
+import Node, { node, NodeType } from "../node";
+import Edge, { edge } from "../edge";
+import { findParent, getRandomInt, IdMap, lolLength } from "../utils";
+import { MinHeapImpl } from "../generic/heap";
+import Maze, { maze } from "../maze";
 import EdgeComparator from "./edgeComparator";
-import {posn} from "../generic/posn";
+import { posn } from "../generic/posn";
 import PosToNodeImpl from "./posToNodeImpl";
 
 /**
@@ -27,7 +27,7 @@ function constructNodes(xDim: number, yDim: number): Node[] {
   nodes.shift();
   nodes.unshift(node(0, posn(0, 0), NodeType.START));
   nodes.pop();
-  nodes.push(node(numNodes - 1, posn(xDim -1, yDim - 1), NodeType.FINISH));
+  nodes.push(node(numNodes - 1, posn(xDim - 1, yDim - 1), NodeType.FINISH));
   return nodes;
 }
 
@@ -39,17 +39,23 @@ function constructNodes(xDim: number, yDim: number): Node[] {
  * @param horizontalCap the cap on horizontal edge weights
  * @param verticalCap the cap on vertical edge weights
  */
-function constructEdges(nodes: Node[], xDim: number, yDim: number, horizontalCap: number, verticalCap: number): Edge[][] {
+function constructEdges(
+  nodes: Node[],
+  xDim: number,
+  yDim: number,
+  horizontalCap: number,
+  verticalCap: number
+): Edge[][] {
   const edges: Edge[][] = [];
   nodes.forEach((node: Node, id) => {
     const nodeEdges = [];
     const pos = node.pos;
     // right neighbor
-    if (pos.x % xDim + 1 < xDim) {
+    if ((pos.x % xDim) + 1 < xDim) {
       nodeEdges.push(edge(id, id + 1, getRandomInt(horizontalCap)));
     }
     // bottom neighbor
-    if (pos.y % yDim + 1 < yDim) {
+    if ((pos.y % yDim) + 1 < yDim) {
       nodeEdges.push(edge(id, id + xDim, getRandomInt(verticalCap)));
     }
     edges.push(nodeEdges);
@@ -81,22 +87,31 @@ function constructMST(edges: Edge[][], numNodes: number): Edge[][] {
     treeEdges.push([]);
     es.forEach((edge) => {
       worklist.insert(edge);
-    })
+    });
   });
 
   while (lolLength(treeEdges) < numTreeEdges * 2) {
     const nextEdge = worklist.extractRoot();
     if (nextEdge && !cycles(parents, nextEdge)) {
       treeEdges[nextEdge.first].push(nextEdge);
-      treeEdges[nextEdge.second].push(edge(nextEdge.second, nextEdge.first, nextEdge.weight));
-      parents.set(findParent(parents, nextEdge.first), findParent(parents, nextEdge.second));
+      treeEdges[nextEdge.second].push(
+        edge(nextEdge.second, nextEdge.first, nextEdge.weight)
+      );
+      parents.set(
+        findParent(parents, nextEdge.first),
+        findParent(parents, nextEdge.second)
+      );
     }
   }
 
   return treeEdges;
 }
 
-export default function constructMaze(xDim: number, yDim: number, bias: number): Maze {
+export default function constructMaze(
+  xDim: number,
+  yDim: number,
+  bias: number
+): Maze {
   let horizontalCap = 100;
   let verticalCap = 100;
   if (bias < 0) {
@@ -108,6 +123,9 @@ export default function constructMaze(xDim: number, yDim: number, bias: number):
   }
 
   const nodes = constructNodes(xDim, yDim);
-  const edges = constructMST(constructEdges(nodes, xDim, yDim, horizontalCap, verticalCap), nodes.length);
+  const edges = constructMST(
+    constructEdges(nodes, xDim, yDim, horizontalCap, verticalCap),
+    nodes.length
+  );
   return maze(nodes, edges, xDim, yDim, new PosToNodeImpl(xDim));
 }

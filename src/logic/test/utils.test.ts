@@ -1,7 +1,7 @@
-import {findParent, getRandomInt, lolLength} from "../utils";
+import { findParent, getRandomInt, lolLength } from "../utils";
 
-describe('Utils tests', () => {
-  it('finds parent and updates parents accordingly', () => {
+describe("Utils tests", () => {
+  it("finds parent and updates parents accordingly", () => {
     const parents = new Map<number, number>();
     parents.set(1, 1);
     parents.set(2, 1);
@@ -15,9 +15,9 @@ describe('Utils tests', () => {
     expect(parents.get(3)).toEqual(2);
     expect(findParent(parents, 3)).toEqual(1);
     expect(parents.get(3)).toEqual(1);
-  })
+  });
 
-  it('generates a random number below the cap', () => {
+  it("generates a random number below the cap", () => {
     const caps = [10, 50, 98, 107];
     caps.forEach((cap) => {
       for (let i = 0; i < 1000; i++) {
@@ -25,15 +25,15 @@ describe('Utils tests', () => {
         expect(rand < cap).toBeTruthy();
         expect(Number.isInteger(rand)).toBeTruthy();
       }
-    })
-  })
+    });
+  });
 
-  it('counts all items in a lol', () => {
+  it("counts all items in a lol", () => {
     const lol1: string[][] = [];
     const lol2 = [[], [], []];
     const lol3 = [[1], [], [2, 3], [4, 5, 6, 7]];
     expect(lolLength(lol1)).toEqual(0);
     expect(lolLength(lol2)).toEqual(0);
     expect(lolLength(lol3)).toEqual(7);
-  })
-})
+  });
+});

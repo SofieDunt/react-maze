@@ -1,6 +1,6 @@
 import Worklist from "./worklist";
 
-class BfsList<T> implements Worklist<T>{
+class BfsList<T> implements Worklist<T> {
   private array: T[][];
   constructor() {
     this.array = [];
@@ -33,7 +33,7 @@ class BfsList<T> implements Worklist<T>{
     this.array.forEach((level) => {
       level.forEach((item) => {
         all.push(item);
-      })
+      });
     });
     this.array = [];
     return all;

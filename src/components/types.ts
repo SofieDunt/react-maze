@@ -10,4 +10,4 @@ export interface MazeComponentDisplayProps extends ScaledDisplayProps {
 
 export const getCellDim = (props: ScaledDisplayProps) => {
   return props.cellDim;
-}
+};

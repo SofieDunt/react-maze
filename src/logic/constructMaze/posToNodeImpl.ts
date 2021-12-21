@@ -1,4 +1,4 @@
-import {PosToNode} from "../maze";
+import { PosToNode } from "../maze";
 import Posn from "../generic/posn";
 
 export default class PosToNodeImpl implements PosToNode {

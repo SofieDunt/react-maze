@@ -10,7 +10,10 @@ export default interface Node {
 }
 
 export enum NodeType {
-  START, FINISH, UNDISCOVERED, FOUND
+  START,
+  FINISH,
+  UNDISCOVERED,
+  FOUND,
 }
 
 export function node(id: number, pos: Posn, type: NodeType): Node {

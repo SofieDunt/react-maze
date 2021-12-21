@@ -108,7 +108,11 @@ export class MinHeapImpl<T> implements Heap<T> {
     const left = this.getLeft(idx);
     if (left) {
       const right = this.getRight(idx);
-      if (right && this.comparator.compare(elem, right.elem) === 1 && this.comparator.compare(right.elem, left.elem) === -1) {
+      if (
+        right &&
+        this.comparator.compare(elem, right.elem) === 1 &&
+        this.comparator.compare(right.elem, left.elem) === -1
+      ) {
         this.swap(idx, right.idx);
         this.downHeap(right.idx);
       } else if (this.comparator.compare(elem, left.elem) === 1) {

@@ -4,9 +4,9 @@ import {
   BORDER_COLOR,
   PRIMARY_PLAYER_COLOR,
   SECONDARY_PLAYER_COLOR,
-  TERTIARY_PLAYER_COLOR
+  TERTIARY_PLAYER_COLOR,
 } from "../../theme";
-import {getCellDim, ScaledDisplayProps} from "../types";
+import { getCellDim, ScaledDisplayProps } from "../types";
 import Maze from "../../logic/maze";
 
 interface PlayerDisplayProps extends ScaledDisplayProps {
@@ -16,15 +16,15 @@ interface PlayerDisplayProps extends ScaledDisplayProps {
 
 const getTop = (props: PlayerDisplayProps): number => {
   return props.player.y * props.cellDim + getPlayerDim(props) / 8;
-}
+};
 
 const getLeft = (props: PlayerDisplayProps): number => {
   return props.player.x * props.cellDim + getPlayerDim(props) / 8;
-}
+};
 
 const getPlayerDim = (props: ScaledDisplayProps): number => {
   return props.cellDim * 0.8;
-}
+};
 
 const getPlayerColor = (props: PlayerDisplayProps): string => {
   const playerNode = props.maze.posToNode.find(props.player);
@@ -35,7 +35,7 @@ const getPlayerColor = (props: PlayerDisplayProps): string => {
   } else {
     return TERTIARY_PLAYER_COLOR;
   }
-}
+};
 
 const PlayerDisplay = styled.div`
   position: absolute;

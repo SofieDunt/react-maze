@@ -1,7 +1,7 @@
-import {MinHeapImpl} from "../generic/heap";
+import { MinHeapImpl } from "../generic/heap";
 import Comparator from "../generic/comparator";
 
-describe('Heap tests', () => {
+describe("Heap tests", () => {
   class NumericComparator implements Comparator<number> {
     compare(one: number, two: number): number {
       if (one === two) {
@@ -18,7 +18,7 @@ describe('Heap tests', () => {
     return new MinHeapImpl<number>(new NumericComparator());
   }
 
-  it('inserts correctly', () => {
+  it("inserts correctly", () => {
     const h = heap();
     const elems = [1, 2, 5, 10, 3, 7, 11, 15, 17, 20];
     elems.forEach((elem) => h.insert(elem));
@@ -45,9 +45,9 @@ describe('Heap tests', () => {
     expect(h.lookup(4)).toEqual(2);
     expect(h.lookup(10)).toEqual(3);
     checkSame();
-  })
+  });
 
-  it('extracts min correctly', () => {
+  it("extracts min correctly", () => {
     const h = heap();
 
     const elems = [1, 2, 5, 10, 3, 7, 11, 15, 17, 20];
@@ -65,5 +65,5 @@ describe('Heap tests', () => {
     expect(h.lookup(6)).toEqual(11);
     expect(h.lookup(7)).toEqual(20);
     expect(h.lookup(8)).toEqual(17);
-  })
-})
+  });
+});

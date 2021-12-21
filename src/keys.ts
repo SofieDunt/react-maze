@@ -1,10 +1,10 @@
-import {SearchType} from "./logic/search";
-import {Directions} from "./logic/navigate";
+import { SearchType } from "./logic/search";
+import { Directions } from "./logic/navigate";
 
 export const SEARCH_KEYS: { [key: string]: SearchType } = {
   b: SearchType.BFS,
   f: SearchType.DFS,
-}
+};
 
 export const MOVE_KEYS: { [key: string]: Directions } = {
   ArrowLeft: Directions.LEFT,
@@ -14,7 +14,7 @@ export const MOVE_KEYS: { [key: string]: Directions } = {
   ArrowUp: Directions.UP,
   w: Directions.UP,
   ArrowDown: Directions.DOWN,
-  s: Directions.DOWN
-}
+  s: Directions.DOWN,
+};
 
-export const RESET_KEYS: Set<string> = new Set<string>('r');
+export const RESET_KEYS: Set<string> = new Set<string>("r");

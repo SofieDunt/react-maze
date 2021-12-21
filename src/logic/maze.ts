@@ -13,7 +13,13 @@ export default interface Maze {
   readonly posToNode: PosToNode;
 }
 
-export function maze(nodes: Node[], edges: Edge[][], xDim: number, yDim: number, posToNode: PosToNode): Maze {
+export function maze(
+  nodes: Node[],
+  edges: Edge[][],
+  xDim: number,
+  yDim: number,
+  posToNode: PosToNode
+): Maze {
   return { nodes, edges, xDim, yDim, posToNode };
 }
 

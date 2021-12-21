@@ -6,6 +6,7 @@ export const InlineText = styled.p`
 `;
 
 export const InlineHeader = styled(InlineText)`
+  font-size: 18px;
   font-weight: bold;
   margin-right: 5px;
 `;

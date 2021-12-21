@@ -1,6 +1,6 @@
 import Worklist from "./worklist";
 
-class LifoList<T> implements Worklist<T>{
+class LifoList<T> implements Worklist<T> {
   private array: T[];
 
   constructor() {
@@ -14,7 +14,7 @@ class LifoList<T> implements Worklist<T>{
     } else {
       return null;
     }
-  };
+  }
 
   removeAll(): T[] {
     const all = this.array;
@@ -29,7 +29,7 @@ class LifoList<T> implements Worklist<T>{
   addAll(items: T[]): void {
     items.forEach((item) => {
       this.array.push(item);
-    })
+    });
   }
 
   isEmpty(): boolean {
