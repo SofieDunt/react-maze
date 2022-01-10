@@ -3,7 +3,7 @@ import styled from "styled-components";
 import PlayerDisplay from "../playerDisplay";
 import { MazeComponentDisplayProps, ScaledDisplayProps } from "../types";
 import { BORDER_COLOR } from "../../theme";
-import { IdMap, MappedSearchDto, MazeDto, PlayerDto } from "../../api/dto";
+import { IdMap, MazeDto, PlayerDto } from "../../api/dto";
 import MazeNodeDisplay, {
   MazeNodeDisplayRenderState,
 } from "../mazeNodeDisplay";
@@ -31,7 +31,8 @@ interface SearchableMazeProps extends ScaledDisplayProps {
   readonly maze: MazeDto;
   readonly source: number;
   readonly target: number;
-  readonly searchResult: MappedSearchDto;
+  readonly found: IdMap;
+  readonly path: IdMap;
   readonly player: PlayerDto;
   readonly playerFound: IdMap;
   readonly delay: number;
@@ -41,7 +42,8 @@ const SearchableMaze: React.FC<SearchableMazeProps> = ({
   maze,
   source,
   target,
-  searchResult,
+  found,
+  path,
   player,
   playerFound,
   delay,
@@ -51,9 +53,9 @@ const SearchableMaze: React.FC<SearchableMazeProps> = ({
     <MazeDisplayContainer maze={maze} cellDim={cellDim}>
       {maze.nodes.map((node, id) => {
         let renderState = MazeNodeDisplayRenderState.STANDARD;
-        if (searchResult.path.has(id)) {
+        if (path.has(id)) {
           renderState = MazeNodeDisplayRenderState.PATH;
-        } else if (searchResult.found.has(id)) {
+        } else if (found.has(id)) {
           renderState = MazeNodeDisplayRenderState.FOUND;
         } else if (playerFound.has(id)) {
           renderState = MazeNodeDisplayRenderState.PLAYER_FOUND;
@@ -61,12 +63,12 @@ const SearchableMaze: React.FC<SearchableMazeProps> = ({
 
         let wait = 0;
         if (renderState === MazeNodeDisplayRenderState.PATH) {
-          const order = searchResult.path.get(node.id);
+          const order = path.get(node.id);
           if (order !== undefined) {
             wait = (order * delay) / 2;
           }
         } else if (renderState === MazeNodeDisplayRenderState.FOUND) {
-          const order = searchResult.found.get(node.id);
+          const order = found.get(node.id);
           if (order !== undefined) {
             wait = order * delay;
           }

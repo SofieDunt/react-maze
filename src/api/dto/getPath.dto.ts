@@ -1,10 +1,10 @@
-import { IdMap } from "./index";
+import { KeyValDto } from "./index";
 
 export class GetPathDto {
-  readonly parents: IdMap;
+  readonly parents: KeyValDto[];
   readonly target: number;
 
-  constructor(parents: IdMap, target: number) {
+  constructor(parents: KeyValDto[], target: number) {
     this.parents = parents;
     this.target = target;
   }

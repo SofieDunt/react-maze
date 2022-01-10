@@ -5,7 +5,7 @@ export * from "./getPath.dto";
 export * from "./getSearch.dto";
 export * from "./idMap";
 export * from "./keyVal.dto";
-export * from "./mappedSearch.dto";
+export * from "./mapMapper";
 export * from "./maze.dto";
 export * from "./mazeNode.dto";
 export * from "./player.dto";

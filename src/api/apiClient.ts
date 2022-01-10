@@ -3,7 +3,7 @@ import {
   GetMoveDto,
   GetPathDto,
   GetSearchDto,
-  IdMap,
+  KeyValDto,
   MazeDto,
   PlayerDto,
   SearchDto,
@@ -48,7 +48,7 @@ class ApiClient {
     return handleAxiosResponse(() => this.axiosInstance.post("search", req));
   }
 
-  async getPath(req: GetPathDto): Promise<IdMap> {
+  async getPath(req: GetPathDto): Promise<KeyValDto[]> {
     return handleAxiosResponse(() =>
       this.axiosInstance.post("search/reconstruct-path", req)
     );
