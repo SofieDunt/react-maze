@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { InlineDisplay, InlineHeader } from './components/utilComponents';
+import { InlineDisplay, InlineHeader } from './components/theme';
 import MakeMazeForm from './components/makeMazeForm';
 import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from './theme';
 import GameDisplay from './components/gameDisplay';

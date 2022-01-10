@@ -1,7 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import { MazeNodeDto } from '../../api/dto';
-import { getCellDim, ScaledDisplayProps } from '../types';
+import { MazeNodeDisplayState, ScaledDisplayProps } from '../types';
 import {
   BORDER_COLOR,
   FINISH_COLOR,
@@ -10,37 +9,31 @@ import {
   STANDARD_COLOR,
   START_COLOR,
 } from '../../theme';
-
-export enum MazeNodeDisplayRenderState {
-  STANDARD,
-  PLAYER_FOUND,
-  FOUND,
-  PATH,
-}
+import { StyledDiv } from './styledDiv';
 
 interface MazeNodeDisplayProps extends ScaledDisplayProps {
   readonly node: MazeNodeDto;
   readonly source: number;
   readonly target: number;
-  readonly renderState: MazeNodeDisplayRenderState;
+  readonly renderState: MazeNodeDisplayState;
+  readonly duration: number;
   readonly delay: number;
-  readonly wait: number;
 }
 
 function getNodeColor(
   node: MazeNodeDto,
   source: number,
   target: number,
-  renderState: MazeNodeDisplayRenderState,
+  renderState: MazeNodeDisplayState,
 ): string {
   switch (renderState) {
-    case MazeNodeDisplayRenderState.PATH:
+    case MazeNodeDisplayState.PATH:
       return PATH_COLOR;
-    case MazeNodeDisplayRenderState.FOUND:
+    case MazeNodeDisplayState.FOUND:
       return FOUND_COLOR;
-    case MazeNodeDisplayRenderState.PLAYER_FOUND:
+    case MazeNodeDisplayState.PLAYER_FOUND:
       return START_COLOR;
-    case MazeNodeDisplayRenderState.STANDARD:
+    case MazeNodeDisplayState.STANDARD:
       if (node.id === source) {
         return START_COLOR;
       } else if (node.id === target) {
@@ -57,7 +50,7 @@ function getRightBorderColor(
   node: MazeNodeDto,
   source: number,
   target: number,
-  renderState: MazeNodeDisplayRenderState,
+  renderState: MazeNodeDisplayState,
 ) {
   if (node.hasPathToRight) {
     return getNodeColor(node, source, target, renderState);
@@ -70,7 +63,7 @@ function getBottomBorderColor(
   node: MazeNodeDto,
   source: number,
   target: number,
-  renderState: MazeNodeDisplayRenderState,
+  renderState: MazeNodeDisplayState,
 ) {
   if (node.hasPathToBottom) {
     return getNodeColor(node, source, target, renderState);
@@ -79,35 +72,13 @@ function getBottomBorderColor(
   }
 }
 
-interface StyleProps extends ScaledDisplayProps {
-  readonly backgroundColor: string;
-  readonly rightBorderColor: string;
-  readonly bottomBorderColor: string;
-  readonly delay: number;
-  readonly wait: number;
-}
-
-const StyledDiv = styled.div`
-  box-sizing: border-box;
-  flex-grow: 1;
-  width: ${getCellDim}px;
-  height: ${getCellDim}px;
-  background: ${(props: StyleProps) => props.backgroundColor};
-  border-right: solid 3px ${(props: StyleProps) => props.rightBorderColor};
-  border-bottom: solid 3px ${(props: StyleProps) => props.bottomBorderColor};
-  transition: background ${(props: StyleProps) => props.delay}ms
-      ${(props: StyleProps) => props.wait}ms,
-    border ${(props: StyleProps) => props.delay}ms
-      ${(props: StyleProps) => props.wait}ms;
-`;
-
 const MazeNodeDisplay: React.FC<MazeNodeDisplayProps> = ({
   node,
   source,
   target,
   renderState,
+  duration,
   delay,
-  wait,
   cellDim,
 }) => {
   return (
@@ -120,8 +91,8 @@ const MazeNodeDisplay: React.FC<MazeNodeDisplayProps> = ({
         target,
         renderState,
       )}
+      duration={duration}
       delay={delay}
-      wait={wait}
       cellDim={cellDim}
     />
   );

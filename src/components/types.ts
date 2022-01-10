@@ -8,6 +8,9 @@ export interface MazeComponentDisplayProps extends ScaledDisplayProps {
   readonly maze: MazeDto;
 }
 
-export const getCellDim = (props: ScaledDisplayProps) => {
-  return props.cellDim;
-};
+export enum MazeNodeDisplayState {
+  STANDARD,
+  PLAYER_FOUND,
+  FOUND,
+  PATH,
+}

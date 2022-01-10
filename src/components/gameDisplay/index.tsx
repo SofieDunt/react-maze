@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { MOVE_KEYS, RESET_KEYS, SEARCH_KEYS } from '../../keys';
-import SearchableMaze from '../searchableMaze';
+import MazeDisplay from '../mazeDisplay';
 import {
   GetMoveDto,
   GetPathDto,
@@ -85,30 +85,28 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
         mappedParents.push(new KeyValDto(key, val)),
       );
 
-      ApiClient.getPath(
-        new GetPathDto(mappedParents, player),
-      ).then((unmappedPath) => {
-        const path = MapMapper.mapKeyVals(unmappedPath);
-        setTimeoutId(
-          setTimeout(
-            () =>
-              setSearchResult((prev) => {
-                return { found: prev.found, path };
-              }),
-            playerFound.size * delay,
-          ),
-        );
-      }).catch((reason: PromiseRejectReason) => {
-        window.alert(reason.message);
-      });
+      ApiClient.getPath(new GetPathDto(mappedParents, player))
+        .then((unmappedPath) => {
+          const path = MapMapper.mapKeyVals(unmappedPath);
+          setTimeoutId(
+            setTimeout(
+              () =>
+                setSearchResult((prev) => {
+                  return { found: prev.found, path };
+                }),
+              playerFound.size * delay,
+            ),
+          );
+        })
+        .catch((reason: PromiseRejectReason) => {
+          window.alert(reason.message);
+        });
     }
   };
 
   function onKeyDown(e: KeyboardEvent): void {
     if (MOVE_KEYS[e.key] !== undefined) {
-      ApiClient.getMove(
-        new GetMoveDto(player, maze, MOVE_KEYS[e.key]),
-      )
+      ApiClient.getMove(new GetMoveDto(player, maze, MOVE_KEYS[e.key]))
         .then((newPlayer) => {
           onPlayerFind(newPlayer);
         })
@@ -118,12 +116,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
     } else if (SEARCH_KEYS[e.key] !== undefined) {
       clearTimeout(timeoutId);
       ApiClient.getSearch(
-        new GetSearchDto(
-          maze,
-          SEARCH_KEYS[e.key],
-          mazeStart,
-          target,
-        ),
+        new GetSearchDto(maze, SEARCH_KEYS[e.key], mazeStart, target),
       )
         .then((res) => {
           const found = MapMapper.mapKeyVals(res.found);
@@ -185,7 +178,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
             : 'Find your way to the node at the bottom right!'}
         </p>
       </SolvedBanner>
-      <SearchableMaze
+      <MazeDisplay
         maze={maze}
         source={mazeStart}
         target={target}
@@ -194,9 +187,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
         player={player}
         playerFound={playerFound}
         cellDim={cellDim}
-        delay={delay}
-      >
-      </SearchableMaze>
+        duration={delay}
+      />
     </>
   );
 };

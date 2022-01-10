@@ -4,17 +4,16 @@ import PlayerDisplay from '../playerDisplay';
 import { MazeComponentDisplayProps, ScaledDisplayProps } from '../types';
 import { BORDER_COLOR } from '../../theme';
 import { IdMap, MazeDto } from '../../api/dto';
-import MazeNodeDisplay, {
-  MazeNodeDisplayRenderState,
-} from '../mazeNodeDisplay';
+import MazeNodeDisplay from '../mazeNodeDisplay';
+import { getMazeNodeState, getNodeTransitionDelay } from '../utils';
 
-const getMazeXDim = (props: MazeComponentDisplayProps) => {
+function getMazeXDim(props: MazeComponentDisplayProps) {
   return props.maze.xDim * props.cellDim;
-};
+}
 
-const getMazeYDim = (props: MazeComponentDisplayProps) => {
+function getMazeYDim(props: MazeComponentDisplayProps) {
   return props.maze.yDim * props.cellDim;
-};
+}
 
 const MazeDisplayContainer = styled.div`
   position: relative;
@@ -27,7 +26,7 @@ const MazeDisplayContainer = styled.div`
   border: 5px solid ${BORDER_COLOR};
 `;
 
-interface SearchableMazeProps extends ScaledDisplayProps {
+interface MazeDisplayProps extends ScaledDisplayProps {
   readonly maze: MazeDto;
   readonly source: number;
   readonly target: number;
@@ -35,10 +34,10 @@ interface SearchableMazeProps extends ScaledDisplayProps {
   readonly path: IdMap;
   readonly player: number;
   readonly playerFound: IdMap;
-  readonly delay: number;
+  readonly duration: number;
 }
 
-const SearchableMaze: React.FC<SearchableMazeProps> = ({
+const MazeDisplay: React.FC<MazeDisplayProps> = ({
   maze,
   source,
   target,
@@ -46,33 +45,20 @@ const SearchableMaze: React.FC<SearchableMazeProps> = ({
   path,
   player,
   playerFound,
-  delay,
+  duration,
   cellDim,
 }) => {
   return (
     <MazeDisplayContainer maze={maze} cellDim={cellDim}>
       {maze.nodes.map((node, id) => {
-        let renderState = MazeNodeDisplayRenderState.STANDARD;
-        if (path.has(id)) {
-          renderState = MazeNodeDisplayRenderState.PATH;
-        } else if (found.has(id)) {
-          renderState = MazeNodeDisplayRenderState.FOUND;
-        } else if (playerFound.has(id)) {
-          renderState = MazeNodeDisplayRenderState.PLAYER_FOUND;
-        }
-
-        let wait = 0;
-        if (renderState === MazeNodeDisplayRenderState.PATH) {
-          const order = path.get(node.id);
-          if (order !== undefined) {
-            wait = (order * delay) / 2;
-          }
-        } else if (renderState === MazeNodeDisplayRenderState.FOUND) {
-          const order = found.get(node.id);
-          if (order !== undefined) {
-            wait = order * delay;
-          }
-        }
+        const renderState = getMazeNodeState(id, found, path, playerFound);
+        const delay = getNodeTransitionDelay(
+          id,
+          renderState,
+          found,
+          path,
+          duration,
+        );
 
         return (
           <MazeNodeDisplay
@@ -81,15 +67,21 @@ const SearchableMaze: React.FC<SearchableMazeProps> = ({
             source={source}
             target={target}
             renderState={renderState}
+            duration={duration}
             delay={delay}
-            wait={wait}
             cellDim={cellDim}
           />
         );
       })}
-      <PlayerDisplay cellDim={cellDim} player={player} maze={maze} source={source} target={target} />
+      <PlayerDisplay
+        cellDim={cellDim}
+        player={player}
+        maze={maze}
+        source={source}
+        target={target}
+      />
     </MazeDisplayContainer>
   );
 };
 
-export default SearchableMaze;
+export default MazeDisplay;

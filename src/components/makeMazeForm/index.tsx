@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { InlineDisplay, InlineHeader } from '../utilComponents';
+import { InlineDisplay, InlineHeader } from '../theme';
 import {
   BANNER_COLOR,
   BORDER_COLOR,
