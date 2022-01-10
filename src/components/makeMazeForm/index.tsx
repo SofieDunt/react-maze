@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { InlineDisplay, InlineHeader } from "../utilComponents";
-import constructMaze from "../../logic/constructMaze";
-import { SetAppProps } from "../../App";
 import {
   BANNER_COLOR,
   BORDER_COLOR,
@@ -11,6 +9,8 @@ import {
   START_COLOR,
   TEXT_COLOR,
 } from "../../theme";
+import { GetMazeDto, MazeDto } from "../../api/dto";
+import ApiClient from "../../api/apiClient";
 
 const Input = styled.input`
   width: 50px;
@@ -40,10 +40,10 @@ const Button = styled.button`
 `;
 
 interface FormProps {
-  readonly setter: SetAppProps;
+  readonly setMaze: (maze: MazeDto) => void;
 }
 
-const MakeMazeForm: React.FC<FormProps> = ({ setter }) => {
+const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
   const [xDimInput, setXDimInput] = useState(5);
   const [yDimInput, setYDimInput] = useState(5);
   const [biasInput, setBiasInput] = useState(0);
@@ -56,10 +56,11 @@ const MakeMazeForm: React.FC<FormProps> = ({ setter }) => {
       yDimInput > 0 &&
       Number.isInteger(biasInput)
     ) {
-      setter.setMaze(constructMaze(xDimInput, yDimInput, biasInput));
-      setter.setXDim(xDimInput);
-      setter.setYDim(yDimInput);
-      setter.setBias(biasInput);
+      ApiClient.getMaze(new GetMazeDto(xDimInput, yDimInput, biasInput)).then(
+        (maze) => {
+          setMaze(maze);
+        }
+      );
     } else {
       window.alert("Invalid Inputs" + xDimInput + yDimInput + biasInput);
     }

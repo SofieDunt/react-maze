@@ -1,29 +1,11 @@
-import React, { useState } from "react";
-import constructMaze from "./logic/constructMaze";
-import Maze from "./logic/maze";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import {
-  InlineDisplay,
-  InlineHeader,
-  InlineText,
-} from "./components/utilComponents";
+import { InlineDisplay, InlineHeader } from "./components/utilComponents";
 import MakeMazeForm from "./components/makeMazeForm";
-import {
-  BACKGROUND,
-  BANNER_COLOR,
-  BORDER_COLOR,
-  PRIMARY_PLAYER_COLOR,
-  STANDARD_COLOR,
-  TEXT_COLOR,
-} from "./theme";
+import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from "./theme";
 import GameDisplay from "./components/gameDisplay";
-
-export interface SetAppProps {
-  readonly setXDim: (xDim: number) => void;
-  readonly setYDim: (yDim: number) => void;
-  readonly setBias: (bias: number) => void;
-  readonly setMaze: (maze: Maze) => void;
-}
+import { GetMazeDto, MazeDto } from "./api/dto";
+import ApiClient from "./api/apiClient";
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -63,42 +45,58 @@ const MazeContainer = styled.div`
 `;
 
 const App = () => {
-  const [xDim, setXDim] = useState(5);
-  const [yDim, setYDim] = useState(5);
-  const [bias, setBias] = useState(0);
-  const [maze, setMaze] = useState<Maze>(constructMaze(xDim, yDim, bias));
+  const [maze, setMaze] = useState<MazeDto>();
 
-  const setter: SetAppProps = { setXDim, setYDim, setBias, setMaze };
+  useEffect(() => {
+    ApiClient.getMaze(new GetMazeDto(5, 5, 0))
+      .then((maze) => {
+        setMaze(maze);
+        console.log(maze);
+      })
+      .catch((err) => console.log(err.message));
+  }, []);
 
-  const displayBias = () => {
-    if (bias < 0) {
-      return "Horizontal (" + Math.abs(bias) + ")";
-    } else if (bias > 0) {
-      return "Vertical (" + Math.abs(bias) + ")";
-    } else {
-      return "Standard";
-    }
-  };
+  if (maze) {
+    console.log(maze);
+    const displayBias = () => {
+      if (maze.bias < 0) {
+        return "Horizontal (" + Math.abs(maze.bias) + ")";
+      } else if (maze.bias > 0) {
+        return "Vertical (" + Math.abs(maze.bias) + ")";
+      } else {
+        return "Standard";
+      }
+    };
 
-  return (
-    <AppContainer>
-      <HeaderContainer>
-        <PageTitle>Maze</PageTitle>
-        <SettingsContainer>
-          <div>
-            <InlineDisplay>
-              <InlineHeader>
-                {yDim} x {xDim} {displayBias()}
-              </InlineHeader>
-            </InlineDisplay>
-          </div>
-          <MakeMazeForm setter={setter} />
-        </SettingsContainer>
-      </HeaderContainer>
+    return (
+      <AppContainer>
+        <HeaderContainer>
+          <PageTitle>Maze</PageTitle>
+          <SettingsContainer>
+            <div>
+              <InlineDisplay>
+                <InlineHeader>
+                  {maze.yDim} x {maze.xDim} {displayBias()}
+                </InlineHeader>
+              </InlineDisplay>
+            </div>
+            <MakeMazeForm setMaze={setMaze} />
+          </SettingsContainer>
+        </HeaderContainer>
 
-      <MazeContainer>{maze && <GameDisplay maze={maze} />}</MazeContainer>
-    </AppContainer>
-  );
+        <MazeContainer>{<GameDisplay maze={maze} />}</MazeContainer>
+      </AppContainer>
+    );
+  } else {
+    return (
+      <AppContainer>
+        <HeaderContainer>
+          <PageTitle>Maze</PageTitle>
+          <InlineHeader>Loading...</InlineHeader>
+        </HeaderContainer>
+      </AppContainer>
+    );
+  }
 };
 
 export default App;

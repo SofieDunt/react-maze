@@ -1,20 +1,19 @@
-import { SearchType } from "./logic/search";
-import { Directions } from "./logic/navigate";
+import { SearchTypeEnum, DirectionEnum } from "./api/dto";
 
-export const SEARCH_KEYS: { [key: string]: SearchType } = {
-  b: SearchType.BFS,
-  f: SearchType.DFS,
+export const SEARCH_KEYS: { [key: string]: SearchTypeEnum } = {
+  b: SearchTypeEnum.BFS,
+  f: SearchTypeEnum.DFS,
 };
 
-export const MOVE_KEYS: { [key: string]: Directions } = {
-  ArrowLeft: Directions.LEFT,
-  a: Directions.LEFT,
-  ArrowRight: Directions.RIGHT,
-  d: Directions.RIGHT,
-  ArrowUp: Directions.UP,
-  w: Directions.UP,
-  ArrowDown: Directions.DOWN,
-  s: Directions.DOWN,
+export const MOVE_KEYS: { [key: string]: DirectionEnum } = {
+  ArrowLeft: DirectionEnum.LEFT,
+  a: DirectionEnum.LEFT,
+  ArrowRight: DirectionEnum.RIGHT,
+  d: DirectionEnum.RIGHT,
+  ArrowUp: DirectionEnum.UP,
+  w: DirectionEnum.UP,
+  ArrowDown: DirectionEnum.DOWN,
+  s: DirectionEnum.DOWN,
 };
 
 export const RESET_KEYS: Set<string> = new Set<string>("r");

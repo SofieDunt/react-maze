@@ -1,11 +1,11 @@
-import Maze from "../logic/maze";
+import { MazeDto } from "../api/dto";
 
 export interface ScaledDisplayProps {
   readonly cellDim: number;
 }
 
 export interface MazeComponentDisplayProps extends ScaledDisplayProps {
-  readonly maze: Maze;
+  readonly maze: MazeDto;
 }
 
 export const getCellDim = (props: ScaledDisplayProps) => {
