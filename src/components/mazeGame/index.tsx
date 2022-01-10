@@ -18,9 +18,11 @@ interface MappedSearchResult {
 }
 
 const mazeStart = 0;
-const noneFound: MappedSearchResult = {
-  found: new Map<number, number>(),
-  path: new Map<number, number>(),
+const noneFound = (): MappedSearchResult => {
+  return {
+    found: new Map<number, number>(),
+    path: new Map<number, number>(),
+  };
 };
 const transitionDuration = 50;
 
@@ -40,19 +42,20 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
 
   const [player, setPlayer] = useState<number>(mazeStart);
   const [playerSolved, setPlayerSolved] = useState(false);
-  const [playerFound, setPlayerFound] = useState(noneFound.found);
+  const [playerFound, setPlayerFound] = useState(noneFound().found);
   const [playerParents, setPlayerParents] = useState(new Map<number, number>());
 
   const [timeoutId, setTimeoutId] = useState<any>();
-  const [searchResult, setSearchResult] =
-    useState<MappedSearchResult>(noneFound);
+  const [searchResult, setSearchResult] = useState<MappedSearchResult>(
+    noneFound(),
+  );
 
   const target = useMemo(() => maze.xDim * maze.yDim - 1, [maze]);
 
   const resetPlayerStates = () => {
     setPlayer(mazeStart);
     setPlayerSolved(false);
-    setPlayerFound(noneFound.found);
+    setPlayerFound(noneFound().found);
     setPlayerParents(new Map<number, number>());
   };
 
@@ -69,7 +72,7 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
 
   const updateSearchWithDelay = (found: IdMap, path: IdMap) => {
     clearTimeout(timeoutId);
-    setSearchResult({ found, path: noneFound.path });
+    setSearchResult({ found, path: noneFound().path });
     setTimeoutId(
       setTimeout(
         () =>
@@ -123,13 +126,13 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
         });
     } else if (RESET_KEYS.has(e.key)) {
       clearTimeout(timeoutId);
-      setSearchResult(noneFound);
+      setSearchResult(noneFound());
       resetPlayerStates();
     }
   }
 
   useEffect(() => {
-    setSearchResult(noneFound);
+    setSearchResult(noneFound());
     resetPlayerStates();
   }, [maze]);
 
