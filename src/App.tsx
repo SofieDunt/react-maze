@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { InlineDisplay, InlineHeader } from './components/theme';
 import MakeMazeForm from './components/makeMazeForm';
 import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from './theme';
-import GameDisplay from './components/gameDisplay';
+import MazeGame from './components/mazeGame';
 import { GetMazeDto, MazeDto } from './api/dto';
 import ApiClient, { PromiseRejectReason } from './api/apiClient';
 
@@ -96,7 +96,7 @@ const App: React.FC = () => {
                 </SettingsContainer>
               </HeaderContainer>
 
-              <MazeContainer>{<GameDisplay maze={maze} />}</MazeContainer>
+              <MazeContainer>{<MazeGame maze={maze} />}</MazeContainer>
             </AppContainer>
           );
         } else {

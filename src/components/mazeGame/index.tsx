@@ -7,7 +7,6 @@ import {
   GetPathDto,
   GetSearchDto,
   IdMap,
-  KeyValDto,
   MazeDto,
   MapMapper,
 } from '../../api/dto';
@@ -23,7 +22,7 @@ const noneFound: MappedSearchResult = {
   found: new Map<number, number>(),
   path: new Map<number, number>(),
 };
-const delay = 50;
+const transitionDuration = 50;
 
 const SolvedBanner = styled.div`
   height: 45px;
@@ -32,16 +31,16 @@ const SolvedBanner = styled.div`
   font-size: 19px;
 `;
 
-interface MazeDisplayProps {
+interface MazeGameProps {
   readonly maze: MazeDto;
 }
 
-const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
+const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
   const [cellDim, setCellDim] = useState(0);
 
   const [player, setPlayer] = useState<number>(mazeStart);
   const [playerSolved, setPlayerSolved] = useState(false);
-  const [playerFound, setPlayerFound] = useState(new Map<number, number>([]));
+  const [playerFound, setPlayerFound] = useState(noneFound.found);
   const [playerParents, setPlayerParents] = useState(new Map<number, number>());
 
   const [timeoutId, setTimeoutId] = useState<any>();
@@ -50,14 +49,10 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
 
   const target = useMemo(() => maze.xDim * maze.yDim - 1, [maze]);
 
-  const resetSearch = () => {
-    setSearchResult(noneFound);
-  };
-
   const resetPlayerStates = () => {
     setPlayer(mazeStart);
     setPlayerSolved(false);
-    setPlayerFound(new Map<number, number>());
+    setPlayerFound(noneFound.found);
     setPlayerParents(new Map<number, number>());
   };
 
@@ -72,30 +67,30 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
     }
   };
 
+  const updateSearchWithDelay = (found: IdMap, path: IdMap) => {
+    clearTimeout(timeoutId);
+    setSearchResult({ found, path: noneFound.path });
+    setTimeoutId(
+      setTimeout(
+        () =>
+          setSearchResult((prev) => {
+            return { found: prev.found, path };
+          }),
+        found.size * transitionDuration,
+      ),
+    );
+  };
+
   const onPlayerSolve = (player: number): void => {
     if (player === target) {
       setPlayerSolved(true);
-      resetSearch();
-      setSearchResult((prev) => {
-        return { found: playerFound, parents: playerParents, path: prev.path };
-      });
-
-      const mappedParents: KeyValDto[] = [];
-      playerParents.forEach((val, key) =>
-        mappedParents.push(new KeyValDto(key, val)),
-      );
-
-      ApiClient.getPath(new GetPathDto(mappedParents, player))
+      ApiClient.getPath(
+        new GetPathDto(MapMapper.mapIdMap(playerParents), player),
+      )
         .then((unmappedPath) => {
-          const path = MapMapper.mapKeyVals(unmappedPath);
-          setTimeoutId(
-            setTimeout(
-              () =>
-                setSearchResult((prev) => {
-                  return { found: prev.found, path };
-                }),
-              playerFound.size * delay,
-            ),
+          updateSearchWithDelay(
+            playerFound,
+            MapMapper.mapKeyVals(unmappedPath),
           );
         })
         .catch((reason: PromiseRejectReason) => {
@@ -114,27 +109,13 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
           window.alert(reason.message);
         });
     } else if (SEARCH_KEYS[e.key] !== undefined) {
-      clearTimeout(timeoutId);
       ApiClient.getSearch(
         new GetSearchDto(maze, SEARCH_KEYS[e.key], mazeStart, target),
       )
         .then((res) => {
-          const found = MapMapper.mapKeyVals(res.found);
-          setSearchResult({
-            found,
-            path: new Map<number, number>(),
-          });
-          setTimeoutId(
-            setTimeout(
-              () =>
-                setSearchResult((prev) => {
-                  return {
-                    found: prev.found,
-                    path: MapMapper.mapKeyVals(res.path),
-                  };
-                }),
-              found.size * delay,
-            ),
+          updateSearchWithDelay(
+            MapMapper.mapKeyVals(res.found),
+            MapMapper.mapKeyVals(res.path),
           );
         })
         .catch((reason: PromiseRejectReason) => {
@@ -142,13 +123,13 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
         });
     } else if (RESET_KEYS.has(e.key)) {
       clearTimeout(timeoutId);
+      setSearchResult(noneFound);
       resetPlayerStates();
-      resetSearch();
     }
   }
 
   useEffect(() => {
-    resetSearch();
+    setSearchResult(noneFound);
     resetPlayerStates();
   }, [maze]);
 
@@ -187,7 +168,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
         player={player}
         playerFound={playerFound}
         cellDim={cellDim}
-        duration={delay}
+        duration={transitionDuration}
       />
     </>
   );
