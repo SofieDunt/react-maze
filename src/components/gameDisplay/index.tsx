@@ -101,6 +101,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
             playerFound.size * delay,
           ),
         );
+      }).catch((reason: PromiseRejectReason) => {
+        window.alert(reason.message);
       });
     }
   };
