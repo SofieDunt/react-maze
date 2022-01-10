@@ -1,12 +1,12 @@
-import React from "react";
-import styled from "styled-components";
-import PlayerDisplay from "../playerDisplay";
-import { MazeComponentDisplayProps, ScaledDisplayProps } from "../types";
-import { BORDER_COLOR } from "../../theme";
-import { IdMap, MazeDto, PlayerDto } from "../../api/dto";
+import React from 'react';
+import styled from 'styled-components';
+import PlayerDisplay from '../playerDisplay';
+import { MazeComponentDisplayProps, ScaledDisplayProps } from '../types';
+import { BORDER_COLOR } from '../../theme';
+import { IdMap, MazeDto, PlayerDto } from '../../api/dto';
 import MazeNodeDisplay, {
   MazeNodeDisplayRenderState,
-} from "../mazeNodeDisplay";
+} from '../mazeNodeDisplay';
 
 const getMazeXDim = (props: MazeComponentDisplayProps) => {
   return props.maze.xDim * props.cellDim;

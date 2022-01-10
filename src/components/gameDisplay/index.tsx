@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
-import PlayerDisplay from "../playerDisplay";
-import { MOVE_KEYS, RESET_KEYS, SEARCH_KEYS } from "../../keys";
-import SearchableMaze from "../searchableMaze";
+import React, { useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
+import PlayerDisplay from '../playerDisplay';
+import { MOVE_KEYS, RESET_KEYS, SEARCH_KEYS } from '../../keys';
+import SearchableMaze from '../searchableMaze';
 import {
   GetMoveDto,
   GetPathDto,
@@ -13,8 +13,8 @@ import {
   PlayerDto,
   PosnDto,
   MapMapper,
-} from "../../api/dto";
-import ApiClient from "../../api/apiClient";
+} from '../../api/dto';
+import ApiClient from '../../api/apiClient';
 
 interface MappedSearchResult {
   readonly found: IdMap;
@@ -85,11 +85,11 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
 
       const mappedParents: KeyValDto[] = [];
       playerParents.forEach((val, key) =>
-        mappedParents.push(new KeyValDto(key, val))
+        mappedParents.push(new KeyValDto(key, val)),
       );
 
       ApiClient.getPath(
-        new GetPathDto(mappedParents, player.nodeLocation)
+        new GetPathDto(mappedParents, player.nodeLocation),
       ).then((unmappedPath) => {
         const path = MapMapper.mapKeyVals(unmappedPath);
         setTimeoutId(
@@ -99,8 +99,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
                 return { found: prev.found, path };
               }),
             playerFound.size * delay,
-            (err: any) => console.log(err.message)
-          )
+            (err: any) => console.log(err.message),
+          ),
         );
       });
     }
@@ -109,12 +109,12 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
   function onKeyDown(e: KeyboardEvent): void {
     if (MOVE_KEYS[e.key] !== undefined) {
       ApiClient.getMove(
-        new GetMoveDto(player.playerPosn, maze, MOVE_KEYS[e.key])
+        new GetMoveDto(player.playerPosn, maze, MOVE_KEYS[e.key]),
       ).then(
         (newPlayer) => {
           onPlayerFind(newPlayer);
         },
-        (err: any) => console.log(err.message)
+        (err: any) => console.log(err.message),
       );
     } else if (SEARCH_KEYS[e.key] !== undefined) {
       clearTimeout(timeoutId);
@@ -123,8 +123,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
           maze,
           SEARCH_KEYS[e.key],
           mazeStart.nodeLocation,
-          target
-        )
+          target,
+        ),
       ).then((res) => {
         const found = MapMapper.mapKeyVals(res.found);
         setSearchResult({
@@ -141,8 +141,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
                 };
               }),
             found.size * delay,
-            (err: any) => console.log(err.message)
-          )
+            (err: any) => console.log(err.message),
+          ),
         );
       });
     } else if (RESET_KEYS.has(e.key)) {
@@ -158,8 +158,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
   }, [maze]);
 
   useEffect(() => {
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   });
 
   useEffect(() => {
@@ -170,8 +170,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
     };
 
     calcCellDim();
-    window.addEventListener("resize", calcCellDim);
-    return () => window.removeEventListener("resize", calcCellDim);
+    window.addEventListener('resize', calcCellDim);
+    return () => window.removeEventListener('resize', calcCellDim);
   });
 
   return (
@@ -179,8 +179,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
       <SolvedBanner>
         <p>
           {playerSolved
-            ? "Maze solved!"
-            : "Find your way to the node at the bottom right!"}
+            ? 'Maze solved!'
+            : 'Find your way to the node at the bottom right!'}
         </p>
       </SolvedBanner>
       <SearchableMaze

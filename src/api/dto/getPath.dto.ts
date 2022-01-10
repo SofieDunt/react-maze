@@ -1,4 +1,4 @@
-import { KeyValDto } from "./index";
+import { KeyValDto } from './index';
 
 export class GetPathDto {
   readonly parents: KeyValDto[];

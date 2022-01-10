@@ -1,4 +1,4 @@
-import { PosnDto } from "./index";
+import { PosnDto } from './index';
 
 export class PlayerDto {
   readonly playerPosn: PosnDto;

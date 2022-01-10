@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import { MazeNodeDto } from "../../api/dto";
-import { getCellDim, ScaledDisplayProps } from "../types";
+import React from 'react';
+import styled from 'styled-components';
+import { MazeNodeDto } from '../../api/dto';
+import { getCellDim, ScaledDisplayProps } from '../types';
 import {
   BORDER_COLOR,
   FINISH_COLOR,
@@ -9,7 +9,7 @@ import {
   PATH_COLOR,
   STANDARD_COLOR,
   START_COLOR,
-} from "../../theme";
+} from '../../theme';
 
 export enum MazeNodeDisplayRenderState {
   STANDARD,
@@ -31,7 +31,7 @@ function getNodeColor(
   node: MazeNodeDto,
   source: number,
   target: number,
-  renderState: MazeNodeDisplayRenderState
+  renderState: MazeNodeDisplayRenderState,
 ): string {
   switch (renderState) {
     case MazeNodeDisplayRenderState.PATH:
@@ -57,7 +57,7 @@ function getRightBorderColor(
   node: MazeNodeDto,
   source: number,
   target: number,
-  renderState: MazeNodeDisplayRenderState
+  renderState: MazeNodeDisplayRenderState,
 ) {
   if (node.hasPathToRight) {
     return getNodeColor(node, source, target, renderState);
@@ -70,7 +70,7 @@ function getBottomBorderColor(
   node: MazeNodeDto,
   source: number,
   target: number,
-  renderState: MazeNodeDisplayRenderState
+  renderState: MazeNodeDisplayRenderState,
 ) {
   if (node.hasPathToBottom) {
     return getNodeColor(node, source, target, renderState);
@@ -118,7 +118,7 @@ const MazeNodeDisplay: React.FC<MazeNodeDisplayProps> = ({
         node,
         source,
         target,
-        renderState
+        renderState,
       )}
       delay={delay}
       wait={wait}

@@ -1,4 +1,4 @@
-import { EdgeDto, MazeNodeDto } from "./index";
+import { EdgeDto, MazeNodeDto } from './index';
 
 export class MazeDto {
   readonly xDim: number;
@@ -12,7 +12,7 @@ export class MazeDto {
     yDim: number,
     bias: number,
     nodes: MazeNodeDto[],
-    edges: EdgeDto[][]
+    edges: EdgeDto[][],
   ) {
     this.xDim = xDim;
     this.yDim = yDim;

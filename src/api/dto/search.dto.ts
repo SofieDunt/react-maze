@@ -1,4 +1,4 @@
-import { IdMap, KeyValDto } from "./index";
+import { IdMap, KeyValDto } from './index';
 
 export class SearchDto {
   readonly found: KeyValDto[];

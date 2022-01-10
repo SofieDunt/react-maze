@@ -1,4 +1,4 @@
-import { SearchTypeEnum, DirectionEnum } from "./api/dto";
+import { SearchTypeEnum, DirectionEnum } from './api/dto';
 
 export const SEARCH_KEYS: { [key: string]: SearchTypeEnum } = {
   b: SearchTypeEnum.BFS,
@@ -16,4 +16,4 @@ export const MOVE_KEYS: { [key: string]: DirectionEnum } = {
   s: DirectionEnum.DOWN,
 };
 
-export const RESET_KEYS: Set<string> = new Set<string>("r");
+export const RESET_KEYS: Set<string> = new Set<string>('r');

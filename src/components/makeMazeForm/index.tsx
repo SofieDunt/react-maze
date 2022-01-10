@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import styled from "styled-components";
-import { InlineDisplay, InlineHeader } from "../utilComponents";
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { InlineDisplay, InlineHeader } from '../utilComponents';
 import {
   BANNER_COLOR,
   BORDER_COLOR,
@@ -8,9 +8,9 @@ import {
   STANDARD_COLOR,
   START_COLOR,
   TEXT_COLOR,
-} from "../../theme";
-import { GetMazeDto, MazeDto } from "../../api/dto";
-import ApiClient from "../../api/apiClient";
+} from '../../theme';
+import { GetMazeDto, MazeDto } from '../../api/dto';
+import ApiClient from '../../api/apiClient';
 
 const Input = styled.input`
   width: 50px;
@@ -59,16 +59,16 @@ const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
       ApiClient.getMaze(new GetMazeDto(xDimInput, yDimInput, biasInput)).then(
         (maze) => {
           setMaze(maze);
-        }
+        },
       );
     } else {
-      window.alert("Invalid Inputs" + xDimInput + yDimInput + biasInput);
+      window.alert('Invalid Inputs' + xDimInput + yDimInput + biasInput);
     }
   };
 
   const validateNumber = (
     val: string,
-    callback: (num: number) => void
+    callback: (num: number) => void,
   ): void => {
     const num = Number(val);
     if (Number.isInteger(num)) {
@@ -81,7 +81,7 @@ const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
       <InlineDisplay>
         <InlineHeader>Rows:</InlineHeader>
         <Input
-          type={"text"}
+          type={'text'}
           onChange={(e) => validateNumber(e.currentTarget.value, setYDimInput)}
           value={yDimInput}
         />
@@ -89,7 +89,7 @@ const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
       <InlineDisplay>
         <InlineHeader>Columns:</InlineHeader>
         <Input
-          type={"text"}
+          type={'text'}
           onChange={(e) => validateNumber(e.currentTarget.value, setXDimInput)}
           value={xDimInput}
         />
@@ -97,7 +97,7 @@ const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
       <InlineDisplay>
         <InlineHeader>Bias:</InlineHeader>
         <Input
-          type={"text"}
+          type={'text'}
           onChange={(e) => validateNumber(e.currentTarget.value, setBiasInput)}
           value={biasInput}
         />

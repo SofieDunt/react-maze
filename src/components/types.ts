@@ -1,4 +1,4 @@
-import { MazeDto } from "../api/dto";
+import { MazeDto } from '../api/dto';
 
 export interface ScaledDisplayProps {
   readonly cellDim: number;

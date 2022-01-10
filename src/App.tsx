@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { InlineDisplay, InlineHeader } from "./components/utilComponents";
-import MakeMazeForm from "./components/makeMazeForm";
-import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from "./theme";
-import GameDisplay from "./components/gameDisplay";
-import { GetMazeDto, MazeDto } from "./api/dto";
-import ApiClient from "./api/apiClient";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { InlineDisplay, InlineHeader } from './components/utilComponents';
+import MakeMazeForm from './components/makeMazeForm';
+import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from './theme';
+import GameDisplay from './components/gameDisplay';
+import { GetMazeDto, MazeDto } from './api/dto';
+import ApiClient from './api/apiClient';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -60,11 +60,11 @@ const App = () => {
     console.log(maze);
     const displayBias = () => {
       if (maze.bias < 0) {
-        return "Horizontal (" + Math.abs(maze.bias) + ")";
+        return 'Horizontal (' + Math.abs(maze.bias) + ')';
       } else if (maze.bias > 0) {
-        return "Vertical (" + Math.abs(maze.bias) + ")";
+        return 'Vertical (' + Math.abs(maze.bias) + ')';
       } else {
-        return "Standard";
+        return 'Standard';
       }
     };
 

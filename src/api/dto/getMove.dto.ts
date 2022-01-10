@@ -1,4 +1,4 @@
-import { PosnDto, MazeDto, DirectionEnum } from "./index";
+import { PosnDto, MazeDto, DirectionEnum } from './index';
 
 export class GetMoveDto {
   readonly player: PosnDto;

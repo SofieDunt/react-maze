@@ -1,4 +1,4 @@
-import { KeyValDto, IdMap } from "./index";
+import { KeyValDto, IdMap } from './index';
 
 export class MapMapper {
   public static mapIdMap(idMap: IdMap): KeyValDto[] {

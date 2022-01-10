@@ -1,4 +1,4 @@
-import { PosnDto } from "./index";
+import { PosnDto } from './index';
 
 export class MazeNodeDto {
   readonly id: number;
@@ -10,7 +10,7 @@ export class MazeNodeDto {
     id: number,
     posn: PosnDto,
     hasPathToRight: boolean,
-    hasPathToBottom: boolean
+    hasPathToBottom: boolean,
   ) {
     this.id = id;
     this.posn = posn;

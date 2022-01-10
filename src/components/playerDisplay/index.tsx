@@ -1,12 +1,12 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 import {
   BORDER_COLOR,
   PRIMARY_PLAYER_COLOR,
   SECONDARY_PLAYER_COLOR,
   TERTIARY_PLAYER_COLOR,
-} from "../../theme";
-import { getCellDim, ScaledDisplayProps } from "../types";
-import { MazeDto, PlayerDto } from "../../api/dto";
+} from '../../theme';
+import { getCellDim, ScaledDisplayProps } from '../types';
+import { MazeDto, PlayerDto } from '../../api/dto';
 
 interface PlayerDisplayProps extends ScaledDisplayProps {
   readonly player: PlayerDto;
