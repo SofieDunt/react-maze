@@ -6,19 +6,21 @@ import {
   TERTIARY_PLAYER_COLOR,
 } from '../../theme';
 import { getCellDim, ScaledDisplayProps } from '../types';
-import { MazeDto, PlayerDto } from '../../api/dto';
+import { MazeDto } from '../../api/dto';
 
 interface PlayerDisplayProps extends ScaledDisplayProps {
-  readonly player: PlayerDto;
+  readonly player: number;
   readonly maze: MazeDto;
+  readonly source: number;
+  readonly target: number;
 }
 
 const getTop = (props: PlayerDisplayProps): number => {
-  return props.player.playerPosn.y * props.cellDim + getPlayerDim(props) / 8;
+  return props.maze.nodes[props.player].posn.y * props.cellDim + getPlayerDim(props) / 8;
 };
 
 const getLeft = (props: PlayerDisplayProps): number => {
-  return props.player.playerPosn.x * props.cellDim + getPlayerDim(props) / 8;
+  return props.maze.nodes[props.player].posn.x * props.cellDim + getPlayerDim(props) / 8;
 };
 
 const getPlayerDim = (props: ScaledDisplayProps): number => {
@@ -27,11 +29,11 @@ const getPlayerDim = (props: ScaledDisplayProps): number => {
 
 const getPlayerColor = (props: PlayerDisplayProps): string => {
   if (
-    props.player.nodeLocation === 0 ||
-    props.player.nodeLocation === props.maze.nodes.length - 1
+    props.player === props.source||
+    props.player === props.target
   ) {
     return PRIMARY_PLAYER_COLOR;
-  } else if (props.player.playerPosn.x % 2 === 0) {
+  } else if (props.maze.nodes[props.player].posn.x % 2 === 0) {
     return SECONDARY_PLAYER_COLOR;
   } else {
     return TERTIARY_PLAYER_COLOR;

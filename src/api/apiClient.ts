@@ -5,7 +5,6 @@ import {
   GetSearchDto,
   KeyValDto,
   MazeDto,
-  PlayerDto,
   SearchDto,
 } from './dto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
@@ -42,7 +41,7 @@ class ApiClient {
     return handleAxiosResponse(() => this.axiosInstance.post('maze', req));
   }
 
-  async getMove(req: GetMoveDto): Promise<PlayerDto> {
+  async getMove(req: GetMoveDto): Promise<number> {
     return handleAxiosResponse(() =>
       this.axiosInstance.post('navigate/move', req),
     );

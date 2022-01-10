@@ -8,7 +8,6 @@ export * from './keyVal.dto';
 export * from './mapMapper';
 export * from './maze.dto';
 export * from './mazeNode.dto';
-export * from './player.dto';
 export * from './posn.dto';
 export * from './search.dto';
 export * from './enum/direction.enum';

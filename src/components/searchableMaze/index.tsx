@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PlayerDisplay from '../playerDisplay';
 import { MazeComponentDisplayProps, ScaledDisplayProps } from '../types';
 import { BORDER_COLOR } from '../../theme';
-import { IdMap, MazeDto, PlayerDto } from '../../api/dto';
+import { IdMap, MazeDto } from '../../api/dto';
 import MazeNodeDisplay, {
   MazeNodeDisplayRenderState,
 } from '../mazeNodeDisplay';
@@ -33,7 +33,7 @@ interface SearchableMazeProps extends ScaledDisplayProps {
   readonly target: number;
   readonly found: IdMap;
   readonly path: IdMap;
-  readonly player: PlayerDto;
+  readonly player: number;
   readonly playerFound: IdMap;
   readonly delay: number;
 }
@@ -87,7 +87,7 @@ const SearchableMaze: React.FC<SearchableMazeProps> = ({
           />
         );
       })}
-      <PlayerDisplay cellDim={cellDim} player={player} maze={maze} />
+      <PlayerDisplay cellDim={cellDim} player={player} maze={maze} source={source} target={target} />
     </MazeDisplayContainer>
   );
 };

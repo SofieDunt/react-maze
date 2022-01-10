@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import PlayerDisplay from '../playerDisplay';
 import { MOVE_KEYS, RESET_KEYS, SEARCH_KEYS } from '../../keys';
 import SearchableMaze from '../searchableMaze';
 import {
@@ -10,8 +9,6 @@ import {
   IdMap,
   KeyValDto,
   MazeDto,
-  PlayerDto,
-  PosnDto,
   MapMapper,
 } from '../../api/dto';
 import ApiClient, { PromiseRejectReason } from '../../api/apiClient';
@@ -21,12 +18,12 @@ interface MappedSearchResult {
   readonly path: IdMap;
 }
 
-const mazeStart = new PlayerDto(new PosnDto(0, 0), 0);
+const mazeStart = 0;
 const noneFound: MappedSearchResult = {
   found: new Map<number, number>(),
   path: new Map<number, number>(),
 };
-const delay = 10;
+const delay = 50;
 
 const SolvedBanner = styled.div`
   height: 45px;
@@ -42,7 +39,7 @@ interface MazeDisplayProps {
 const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
   const [cellDim, setCellDim] = useState(0);
 
-  const [player, setPlayer] = useState<PlayerDto>(mazeStart);
+  const [player, setPlayer] = useState<number>(mazeStart);
   const [playerSolved, setPlayerSolved] = useState(false);
   const [playerFound, setPlayerFound] = useState(new Map<number, number>([]));
   const [playerParents, setPlayerParents] = useState(new Map<number, number>());
@@ -64,10 +61,10 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
     setPlayerParents(new Map<number, number>());
   };
 
-  const onPlayerFind = (found: PlayerDto): void => {
-    if (!playerFound.has(found.nodeLocation)) {
-      playerFound.set(found.nodeLocation, playerFound.size + 1);
-      playerParents.set(found.nodeLocation, player.nodeLocation);
+  const onPlayerFind = (found: number): void => {
+    if (!playerFound.has(found)) {
+      playerFound.set(found, playerFound.size + 1);
+      playerParents.set(found, player);
       setPlayer(found);
       onPlayerSolve(found);
     } else {
@@ -75,8 +72,8 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
     }
   };
 
-  const onPlayerSolve = (player: PlayerDto): void => {
-    if (player.nodeLocation === target) {
+  const onPlayerSolve = (player: number): void => {
+    if (player === target) {
       setPlayerSolved(true);
       resetSearch();
       setSearchResult((prev) => {
@@ -89,7 +86,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
       );
 
       ApiClient.getPath(
-        new GetPathDto(mappedParents, player.nodeLocation),
+        new GetPathDto(mappedParents, player),
       ).then((unmappedPath) => {
         const path = MapMapper.mapKeyVals(unmappedPath);
         setTimeoutId(
@@ -110,7 +107,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
   function onKeyDown(e: KeyboardEvent): void {
     if (MOVE_KEYS[e.key] !== undefined) {
       ApiClient.getMove(
-        new GetMoveDto(player.playerPosn, maze, MOVE_KEYS[e.key]),
+        new GetMoveDto(player, maze, MOVE_KEYS[e.key]),
       )
         .then((newPlayer) => {
           onPlayerFind(newPlayer);
@@ -124,7 +121,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
         new GetSearchDto(
           maze,
           SEARCH_KEYS[e.key],
-          mazeStart.nodeLocation,
+          mazeStart,
           target,
         ),
       )
@@ -190,7 +187,7 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
       </SolvedBanner>
       <SearchableMaze
         maze={maze}
-        source={mazeStart.nodeLocation}
+        source={mazeStart}
         target={target}
         found={searchResult.found}
         path={searchResult.path}
@@ -199,7 +196,6 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
         cellDim={cellDim}
         delay={delay}
       >
-        <PlayerDisplay cellDim={cellDim} player={player} maze={maze} />
       </SearchableMaze>
     </>
   );
