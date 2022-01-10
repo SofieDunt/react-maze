@@ -10,6 +10,10 @@ import {
 } from './dto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
+export interface PromiseRejectReason {
+  message: string;
+}
+
 const handleAxiosResponse = async <T>(
   execute: () => Promise<AxiosResponse<T>>,
 ): Promise<T> => {

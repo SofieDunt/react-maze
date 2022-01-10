@@ -14,7 +14,7 @@ import {
   PosnDto,
   MapMapper,
 } from '../../api/dto';
-import ApiClient from '../../api/apiClient';
+import ApiClient, { PromiseRejectReason } from '../../api/apiClient';
 
 interface MappedSearchResult {
   readonly found: IdMap;
@@ -99,7 +99,6 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
                 return { found: prev.found, path };
               }),
             playerFound.size * delay,
-            (err: any) => console.log(err.message),
           ),
         );
       });
@@ -110,12 +109,13 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
     if (MOVE_KEYS[e.key] !== undefined) {
       ApiClient.getMove(
         new GetMoveDto(player.playerPosn, maze, MOVE_KEYS[e.key]),
-      ).then(
-        (newPlayer) => {
+      )
+        .then((newPlayer) => {
           onPlayerFind(newPlayer);
-        },
-        (err: any) => console.log(err.message),
-      );
+        })
+        .catch((reason: PromiseRejectReason) => {
+          window.alert(reason.message);
+        });
     } else if (SEARCH_KEYS[e.key] !== undefined) {
       clearTimeout(timeoutId);
       ApiClient.getSearch(
@@ -125,26 +125,29 @@ const MazeGame: React.FC<MazeDisplayProps> = ({ maze }) => {
           mazeStart.nodeLocation,
           target,
         ),
-      ).then((res) => {
-        const found = MapMapper.mapKeyVals(res.found);
-        setSearchResult({
-          found,
-          path: new Map<number, number>(),
+      )
+        .then((res) => {
+          const found = MapMapper.mapKeyVals(res.found);
+          setSearchResult({
+            found,
+            path: new Map<number, number>(),
+          });
+          setTimeoutId(
+            setTimeout(
+              () =>
+                setSearchResult((prev) => {
+                  return {
+                    found: prev.found,
+                    path: MapMapper.mapKeyVals(res.path),
+                  };
+                }),
+              found.size * delay,
+            ),
+          );
+        })
+        .catch((reason: PromiseRejectReason) => {
+          window.alert(reason.message);
         });
-        setTimeoutId(
-          setTimeout(
-            () =>
-              setSearchResult((prev) => {
-                return {
-                  found: prev.found,
-                  path: MapMapper.mapKeyVals(res.path),
-                };
-              }),
-            found.size * delay,
-            (err: any) => console.log(err.message),
-          ),
-        );
-      });
     } else if (RESET_KEYS.has(e.key)) {
       clearTimeout(timeoutId);
       resetPlayerStates();

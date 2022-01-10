@@ -10,7 +10,7 @@ import {
   TEXT_COLOR,
 } from '../../theme';
 import { GetMazeDto, MazeDto } from '../../api/dto';
-import ApiClient from '../../api/apiClient';
+import ApiClient, { PromiseRejectReason } from '../../api/apiClient';
 
 const Input = styled.input`
   width: 50px;
@@ -56,11 +56,13 @@ const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
       yDimInput > 0 &&
       Number.isInteger(biasInput)
     ) {
-      ApiClient.getMaze(new GetMazeDto(xDimInput, yDimInput, biasInput)).then(
-        (maze) => {
+      ApiClient.getMaze(new GetMazeDto(xDimInput, yDimInput, biasInput))
+        .then((maze) => {
           setMaze(maze);
-        },
-      );
+        })
+        .catch((reason: PromiseRejectReason) => {
+          window.alert(reason.message);
+        });
     } else {
       window.alert('Invalid Inputs' + xDimInput + yDimInput + biasInput);
     }

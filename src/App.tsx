@@ -5,7 +5,7 @@ import MakeMazeForm from './components/makeMazeForm';
 import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from './theme';
 import GameDisplay from './components/gameDisplay';
 import { GetMazeDto, MazeDto } from './api/dto';
-import ApiClient from './api/apiClient';
+import ApiClient, { PromiseRejectReason } from './api/apiClient';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -44,59 +44,80 @@ const MazeContainer = styled.div`
   padding: 0 30px 25px;
 `;
 
-const App = () => {
+enum Status {
+  LOADING,
+  LOADED,
+  FAILED,
+}
+
+const App: React.FC = () => {
   const [maze, setMaze] = useState<MazeDto>();
+  const [status, setStatus] = useState<Status>(Status.LOADING);
 
   useEffect(() => {
     ApiClient.getMaze(new GetMazeDto(5, 5, 0))
       .then((maze) => {
+        setStatus(Status.LOADED);
         setMaze(maze);
-        console.log(maze);
       })
-      .catch((err) => console.log(err.message));
+      .catch((reason: PromiseRejectReason) => {
+        setStatus(Status.FAILED);
+        window.alert(reason.message);
+      });
   }, []);
 
-  if (maze) {
-    console.log(maze);
-    const displayBias = () => {
-      if (maze.bias < 0) {
-        return 'Horizontal (' + Math.abs(maze.bias) + ')';
-      } else if (maze.bias > 0) {
-        return 'Vertical (' + Math.abs(maze.bias) + ')';
-      } else {
-        return 'Standard';
-      }
-    };
+  return (
+    <>
+      {(() => {
+        if (maze) {
+          const displayBias = () => {
+            if (maze.bias < 0) {
+              return 'Horizontal (' + Math.abs(maze.bias) + ')';
+            } else if (maze.bias > 0) {
+              return 'Vertical (' + Math.abs(maze.bias) + ')';
+            } else {
+              return 'Standard';
+            }
+          };
 
-    return (
-      <AppContainer>
-        <HeaderContainer>
-          <PageTitle>Maze</PageTitle>
-          <SettingsContainer>
-            <div>
-              <InlineDisplay>
-                <InlineHeader>
-                  {maze.yDim} x {maze.xDim} {displayBias()}
-                </InlineHeader>
-              </InlineDisplay>
-            </div>
-            <MakeMazeForm setMaze={setMaze} />
-          </SettingsContainer>
-        </HeaderContainer>
+          return (
+            <AppContainer>
+              <HeaderContainer>
+                <PageTitle>Maze</PageTitle>
+                <SettingsContainer>
+                  <div>
+                    <InlineDisplay>
+                      <InlineHeader>
+                        {maze.yDim} x {maze.xDim} {displayBias()}
+                      </InlineHeader>
+                    </InlineDisplay>
+                  </div>
+                  <MakeMazeForm setMaze={setMaze} />
+                </SettingsContainer>
+              </HeaderContainer>
 
-        <MazeContainer>{<GameDisplay maze={maze} />}</MazeContainer>
-      </AppContainer>
-    );
-  } else {
-    return (
-      <AppContainer>
-        <HeaderContainer>
-          <PageTitle>Maze</PageTitle>
-          <InlineHeader>Loading...</InlineHeader>
-        </HeaderContainer>
-      </AppContainer>
-    );
-  }
+              <MazeContainer>{<GameDisplay maze={maze} />}</MazeContainer>
+            </AppContainer>
+          );
+        } else {
+          return (
+            <AppContainer>
+              <HeaderContainer>
+                <PageTitle>Maze</PageTitle>
+                <SettingsContainer>
+                  <InlineHeader>
+                    {status === Status.LOADING
+                      ? 'Loading...'
+                      : 'Failed to start maze.'}
+                  </InlineHeader>
+                </SettingsContainer>
+              </HeaderContainer>
+            </AppContainer>
+          );
+        }
+      })()}
+    </>
+  );
 };
 
 export default App;
