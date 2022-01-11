@@ -23,7 +23,8 @@ const MazeDisplayContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-content: stretch;
-  border: 5px solid ${BORDER_COLOR};
+  border-left: 5px solid ${BORDER_COLOR};
+  border-top: 5px solid ${BORDER_COLOR};
 `;
 
 interface MazeDisplayProps extends ScaledDisplayProps {

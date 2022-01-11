@@ -31,7 +31,7 @@ function getLeft(props: PlayerDisplayProps): number {
 }
 
 function getPlayerDim(props: ScaledDisplayProps): number {
-  return props.cellDim * 0.8;
+  return props.cellDim * 0.7;
 }
 
 function getPlayerColor(props: PlayerDisplayProps): string {
@@ -49,7 +49,7 @@ const PlayerDisplay = styled.div`
   top: ${getTop}px;
   left: ${getLeft}px;
   background: ${getPlayerColor};
-  border: 1px solid ${BORDER_COLOR};
+  border: solid 2px ${BORDER_COLOR};
   border-radius: ${getCellDim}px;
   width: ${getPlayerDim}px;
   height: ${getPlayerDim}px;

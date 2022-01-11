@@ -4,11 +4,11 @@ import { InlineDisplay, InlineHeader } from './components/theme';
 import MakeMazeForm from './components/makeMazeForm';
 import { BACKGROUND, BANNER_COLOR, BORDER_COLOR, TEXT_COLOR } from './theme';
 import MazeGame from './components/mazeGame';
-import { GetMazeDto, MazeDto } from './api/dto';
+import { GameDto, GetGameDto, IdMap, MapMapper } from './api/dto';
 import ApiClient, { PromiseRejectReason } from './api/apiClient';
 
 const AppContainer = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   font-family: Nunito Sans, sans-serif;
   margin: 0;
   box-sizing: border-box;
@@ -22,7 +22,7 @@ const PageTitle = styled.h1`
   background: ${BANNER_COLOR};
   color: ${BORDER_COLOR};
   padding: 10px 20px;
-  min-width: 100vw;
+  width: 100%;
   box-sizing: border-box;
 `;
 
@@ -32,15 +32,9 @@ const SettingsContainer = styled.div`
   line-height: 35px;
 `;
 
-const HeaderContainer = styled.div`
-  box-sizing: border-box;
-  min-height: 15vh;
-`;
-
 const MazeContainer = styled.div`
   box-sizing: border-box;
   min-width: 100vw;
-  min-height: 85vh;
   padding: 0 30px 25px;
 `;
 
@@ -50,15 +44,24 @@ enum Status {
   FAILED,
 }
 
+export const getTarget = (xDim: number, yDim: number): number => {
+  return xDim * yDim - 1;
+};
+
+export interface MappedSearchResult {
+  readonly found: IdMap;
+  readonly path: IdMap;
+}
+
 const App: React.FC = () => {
-  const [maze, setMaze] = useState<MazeDto>();
+  const [game, setGame] = useState<GameDto>();
   const [status, setStatus] = useState<Status>(Status.LOADING);
 
   useEffect(() => {
-    ApiClient.getMaze(new GetMazeDto(5, 5, 0))
-      .then((maze) => {
+    ApiClient.getGame(new GetGameDto(5, 5, 0, 0, getTarget(5, 5)))
+      .then((game) => {
         setStatus(Status.LOADED);
-        setMaze(maze);
+        setGame(game);
       })
       .catch((reason: PromiseRejectReason) => {
         setStatus(Status.FAILED);
@@ -69,7 +72,17 @@ const App: React.FC = () => {
   return (
     <>
       {(() => {
-        if (maze) {
+        if (game) {
+          const maze = game.maze;
+          const bfsSearch: MappedSearchResult = {
+            found: MapMapper.mapKeyVals(game.bfsSearch.found),
+            path: MapMapper.mapKeyVals(game.bfsSearch.path),
+          };
+          const dfsSearch: MappedSearchResult = {
+            found: MapMapper.mapKeyVals(game.dfsSearch.found),
+            path: MapMapper.mapKeyVals(game.dfsSearch.path),
+          };
+
           const displayBias = () => {
             if (maze.bias < 0) {
               return 'Horizontal (' + Math.abs(maze.bias) + ')';
@@ -82,36 +95,40 @@ const App: React.FC = () => {
 
           return (
             <AppContainer>
-              <HeaderContainer>
-                <PageTitle>Maze</PageTitle>
-                <SettingsContainer>
-                  <div>
-                    <InlineDisplay>
-                      <InlineHeader>
-                        {maze.yDim} x {maze.xDim} {displayBias()}
-                      </InlineHeader>
-                    </InlineDisplay>
-                  </div>
-                  <MakeMazeForm setMaze={setMaze} />
-                </SettingsContainer>
-              </HeaderContainer>
+              <PageTitle>Maze</PageTitle>
+              <SettingsContainer>
+                <div>
+                  <InlineDisplay>
+                    <InlineHeader>
+                      {maze.yDim} x {maze.xDim} {displayBias()}
+                    </InlineHeader>
+                  </InlineDisplay>
+                </div>
+                <MakeMazeForm setGame={setGame} />
+              </SettingsContainer>
 
-              <MazeContainer>{<MazeGame maze={maze} />}</MazeContainer>
+              <MazeContainer>
+                {
+                  <MazeGame
+                    maze={maze}
+                    bfsSearch={bfsSearch}
+                    dfsSearch={dfsSearch}
+                  />
+                }
+              </MazeContainer>
             </AppContainer>
           );
         } else {
           return (
             <AppContainer>
-              <HeaderContainer>
-                <PageTitle>Maze</PageTitle>
-                <SettingsContainer>
-                  <InlineHeader>
-                    {status === Status.LOADING
-                      ? 'Loading...'
-                      : 'Failed to start maze.'}
-                  </InlineHeader>
-                </SettingsContainer>
-              </HeaderContainer>
+              <PageTitle>Maze</PageTitle>
+              <SettingsContainer>
+                <InlineHeader>
+                  {status === Status.LOADING
+                    ? 'Loading...'
+                    : 'Failed to start maze.'}
+                </InlineHeader>
+              </SettingsContainer>
             </AppContainer>
           );
         }

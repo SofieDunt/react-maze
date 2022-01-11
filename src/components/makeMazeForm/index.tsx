@@ -4,13 +4,14 @@ import { InlineDisplay, InlineHeader } from '../theme';
 import {
   BANNER_COLOR,
   BORDER_COLOR,
-  FINISH_COLOR,
+  SECONDARY_PLAYER_COLOR,
   STANDARD_COLOR,
-  START_COLOR,
+  TERTIARY_PLAYER_COLOR,
   TEXT_COLOR,
 } from '../../theme';
-import { GetMazeDto, MazeDto } from '../../api/dto';
+import { GameDto, GetGameDto } from '../../api/dto';
 import ApiClient, { PromiseRejectReason } from '../../api/apiClient';
+import { getTarget } from '../../App';
 
 const Input = styled.input`
   width: 50px;
@@ -20,7 +21,7 @@ const Input = styled.input`
   border-bottom: solid 2px ${BORDER_COLOR};
   font-family: Caveat, Nunito Sans, sans-serif;
   font-size: 25px;
-  padding: 3px;
+  padding: 5px;
   text-align: center;
   font-weight: bold;
 `;
@@ -28,22 +29,22 @@ const Input = styled.input`
 const Button = styled.button`
   z-index: 9;
   border: 2px solid ${BORDER_COLOR};
-  background: ${START_COLOR};
+  background: ${SECONDARY_PLAYER_COLOR};
   color: ${BANNER_COLOR};
   font-family: Nunito Sans, sans-serif;
   padding: 5px;
   font-size: 15px;
   &:hover {
-    background: ${FINISH_COLOR};
+    background: ${TERTIARY_PLAYER_COLOR};
     border: 2px solid ${STANDARD_COLOR};
   }
 `;
 
 interface FormProps {
-  readonly setMaze: (maze: MazeDto) => void;
+  readonly setGame: (game: GameDto) => void;
 }
 
-const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
+const MakeMazeForm: React.FC<FormProps> = ({ setGame }) => {
   const [xDimInput, setXDimInput] = useState(5);
   const [yDimInput, setYDimInput] = useState(5);
   const [biasInput, setBiasInput] = useState(0);
@@ -56,9 +57,17 @@ const MakeMazeForm: React.FC<FormProps> = ({ setMaze }) => {
       yDimInput > 0 &&
       Number.isInteger(biasInput)
     ) {
-      ApiClient.getMaze(new GetMazeDto(xDimInput, yDimInput, biasInput))
-        .then((maze) => {
-          setMaze(maze);
+      ApiClient.getGame(
+        new GetGameDto(
+          xDimInput,
+          yDimInput,
+          biasInput,
+          0,
+          getTarget(xDimInput, yDimInput),
+        ),
+      )
+        .then((game) => {
+          setGame(game);
         })
         .catch((reason: PromiseRejectReason) => {
           window.alert(reason.message);

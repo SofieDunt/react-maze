@@ -1,12 +1,4 @@
-import {
-  GetMazeDto,
-  GetMoveDto,
-  GetPathDto,
-  GetSearchDto,
-  KeyValDto,
-  MazeDto,
-  SearchDto,
-} from './dto';
+import { GameDto, GetGameDto, GetPathDto, KeyValDto } from './dto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 export interface PromiseRejectReason {
@@ -37,18 +29,19 @@ class ApiClient {
     });
   }
 
-  async getMaze(req: GetMazeDto): Promise<MazeDto> {
-    return handleAxiosResponse(() => this.axiosInstance.post('maze', req));
-  }
-
-  async getMove(req: GetMoveDto): Promise<number> {
-    return handleAxiosResponse(() =>
-      this.axiosInstance.post('navigate/move', req),
-    );
-  }
-
-  async getSearch(req: GetSearchDto): Promise<SearchDto> {
-    return handleAxiosResponse(() => this.axiosInstance.post('search', req));
+  async getGame(req: GetGameDto): Promise<GameDto> {
+    const pathWithParams =
+      'game/' +
+      req.xDim +
+      '/' +
+      req.yDim +
+      '/' +
+      req.bias +
+      '/' +
+      req.source +
+      '/' +
+      req.target;
+    return handleAxiosResponse(() => this.axiosInstance.get(pathWithParams));
   }
 
   async getPath(req: GetPathDto): Promise<KeyValDto[]> {

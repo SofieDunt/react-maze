@@ -3,19 +3,15 @@ import styled from 'styled-components';
 import { MOVE_KEYS, RESET_KEYS, SEARCH_KEYS } from '../../keys';
 import MazeDisplay from '../mazeDisplay';
 import {
-  GetMoveDto,
   GetPathDto,
-  GetSearchDto,
   IdMap,
-  MazeDto,
   MapMapper,
+  MazeDto,
+  SearchTypeEnum,
 } from '../../api/dto';
 import ApiClient, { PromiseRejectReason } from '../../api/apiClient';
-
-interface MappedSearchResult {
-  readonly found: IdMap;
-  readonly path: IdMap;
-}
+import Navigator from './nav';
+import { MappedSearchResult } from '../../App';
 
 const mazeStart = 0;
 const noneFound = (): MappedSearchResult => {
@@ -35,9 +31,11 @@ const SolvedBanner = styled.div`
 
 interface MazeGameProps {
   readonly maze: MazeDto;
+  readonly bfsSearch: MappedSearchResult;
+  readonly dfsSearch: MappedSearchResult;
 }
 
-const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
+const MazeGame: React.FC<MazeGameProps> = ({ maze, bfsSearch, dfsSearch }) => {
   const [cellDim, setCellDim] = useState(0);
 
   const [player, setPlayer] = useState<number>(mazeStart);
@@ -59,17 +57,6 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
     setPlayerParents(new Map<number, number>());
   };
 
-  const onPlayerFind = (found: number): void => {
-    if (!playerFound.has(found)) {
-      playerFound.set(found, playerFound.size + 1);
-      playerParents.set(found, player);
-      setPlayer(found);
-      onPlayerSolve(found);
-    } else {
-      setPlayer(found);
-    }
-  };
-
   const updateSearchWithDelay = (found: IdMap, path: IdMap) => {
     clearTimeout(timeoutId);
     setSearchResult({ found, path: noneFound().path });
@@ -84,11 +71,24 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
     );
   };
 
+  const onPlayerFind = (found: number): void => {
+    if (!playerFound.has(found)) {
+      // + 2 because will add start node as 1st found
+      playerFound.set(found, playerFound.size + 2);
+      playerParents.set(found, player);
+      setPlayer(found);
+      onPlayerSolve(found);
+    } else {
+      setPlayer(found);
+    }
+  };
+
   const onPlayerSolve = (player: number): void => {
     if (player === target) {
       setPlayerSolved(true);
+      playerFound.set(0, 1); // found start node first
       ApiClient.getPath(
-        new GetPathDto(MapMapper.mapIdMap(playerParents), player),
+        new GetPathDto(MapMapper.mapIdMap(playerParents), mazeStart, player),
       )
         .then((unmappedPath) => {
           updateSearchWithDelay(
@@ -104,26 +104,27 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
 
   function onKeyDown(e: KeyboardEvent): void {
     if (MOVE_KEYS[e.key] !== undefined) {
-      ApiClient.getMove(new GetMoveDto(player, maze, MOVE_KEYS[e.key]))
-        .then((newPlayer) => {
-          onPlayerFind(newPlayer);
-        })
-        .catch((reason: PromiseRejectReason) => {
-          window.alert(reason.message);
-        });
+      const newPlayer = Navigator.move(player, maze, MOVE_KEYS[e.key]);
+      onPlayerFind(newPlayer);
     } else if (SEARCH_KEYS[e.key] !== undefined) {
-      ApiClient.getSearch(
-        new GetSearchDto(maze, SEARCH_KEYS[e.key], mazeStart, target),
-      )
-        .then((res) => {
+      setSearchResult(noneFound());
+      let requestedSearchResult = noneFound();
+      switch (SEARCH_KEYS[e.key]) {
+        case SearchTypeEnum.BFS:
+          requestedSearchResult = bfsSearch;
+          break;
+        case SearchTypeEnum.DFS:
+          requestedSearchResult = dfsSearch;
+          break;
+      }
+      setTimeout(
+        () =>
           updateSearchWithDelay(
-            MapMapper.mapKeyVals(res.found),
-            MapMapper.mapKeyVals(res.path),
-          );
-        })
-        .catch((reason: PromiseRejectReason) => {
-          window.alert(reason.message);
-        });
+            requestedSearchResult.found,
+            requestedSearchResult.path,
+          ),
+        transitionDuration,
+      );
     } else if (RESET_KEYS.has(e.key)) {
       clearTimeout(timeoutId);
       setSearchResult(noneFound());
@@ -144,8 +145,8 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze }) => {
   useEffect(() => {
     const calcCellDim = () => {
       const width = window.innerWidth - 50;
-      const height = window.innerHeight - 350;
-      setCellDim(Math.max(Math.min(width / maze.xDim, height / maze.yDim), 15));
+      const height = window.innerHeight - 250;
+      setCellDim(Math.max(Math.min(width / maze.xDim, height / maze.yDim), 20));
     };
 
     calcCellDim();
