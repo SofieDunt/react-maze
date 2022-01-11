@@ -95,7 +95,7 @@ const App: React.FC = () => {
 
           return (
             <AppContainer>
-              <PageTitle>Maze</PageTitle>
+              <PageTitle>Maze 2.0</PageTitle>
               <SettingsContainer>
                 <div>
                   <InlineDisplay>
