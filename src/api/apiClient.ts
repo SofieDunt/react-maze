@@ -1,4 +1,4 @@
-import { GameDto, GetGameDto, GetPathDto, KeyValDto } from './dto';
+import { GameDto, GetGameDto } from './dto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
 export interface PromiseRejectReason {
@@ -42,12 +42,6 @@ class ApiClient {
       '/' +
       req.target;
     return handleAxiosResponse(() => this.axiosInstance.get(pathWithParams));
-  }
-
-  async getPath(req: GetPathDto): Promise<KeyValDto[]> {
-    return handleAxiosResponse(() =>
-      this.axiosInstance.post('search/reconstruct-path', req),
-    );
   }
 }
 

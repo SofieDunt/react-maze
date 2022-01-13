@@ -2,14 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { MOVE_KEYS, RESET_KEYS, SEARCH_KEYS } from '../../keys';
 import MazeDisplay from '../mazeDisplay';
-import {
-  GetPathDto,
-  IdMap,
-  MapMapper,
-  MazeDto,
-  SearchTypeEnum,
-} from '../../api/dto';
-import ApiClient, { PromiseRejectReason } from '../../api/apiClient';
+import { IdMap, MazeDto, SearchTypeEnum } from '../../api/dto';
 import Navigator from './nav';
 import { MappedSearchResult } from '../../App';
 
@@ -87,18 +80,7 @@ const MazeGame: React.FC<MazeGameProps> = ({ maze, bfsSearch, dfsSearch }) => {
     if (player === target) {
       setPlayerSolved(true);
       playerFound.set(0, 1); // found start node first
-      ApiClient.getPath(
-        new GetPathDto(MapMapper.mapIdMap(playerParents), mazeStart, player),
-      )
-        .then((unmappedPath) => {
-          updateSearchWithDelay(
-            playerFound,
-            MapMapper.mapKeyVals(unmappedPath),
-          );
-        })
-        .catch((reason: PromiseRejectReason) => {
-          window.alert(reason.message);
-        });
+      updateSearchWithDelay(playerFound, bfsSearch.path);
     }
   };
 
